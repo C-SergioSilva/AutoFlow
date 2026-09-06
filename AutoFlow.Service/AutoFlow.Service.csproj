@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AutoFlow.Domain\AutoFlow.Domain.csproj" />
+    <ProjectReference Include="..\AutoFlow.Infrastructure\AutoFlow.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
