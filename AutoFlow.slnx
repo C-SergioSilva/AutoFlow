@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AutoFlow.Domain/AutoFlow.Domain.csproj" />
+  <Project Path="AutoFlow.Infrastructure/AutoFlow.Infrastructure.csproj" />
+  <Project Path="AutoFlow.Service/AutoFlow.Service.csproj" />
+  <Project Path="AutoFlow.UI/AutoFlow.UI.csproj" />
+</Solution>
