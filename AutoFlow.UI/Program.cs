@@ -6,8 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 #region [Add services to the container]
 
     builder.Services.AddControllersWithViews();
+    builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion
 
 var app = builder.Build();
