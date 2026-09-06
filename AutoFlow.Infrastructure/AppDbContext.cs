@@ -20,6 +20,8 @@ namespace AutoFlow.Infrastructure.Data
 
             // Aqui podemos aplicar configurações adicionais nas tabelas se precisarmos no futuro
             // Exemplo: definir tamanhos máximos de strings, chaves compostas, etc.
+            // Aplica automaticamente todas as classes de mapeamento que herdam de IEntityTypeConfiguration neste assembly
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }
 }
