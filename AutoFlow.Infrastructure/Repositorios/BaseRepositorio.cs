@@ -1,4 +1,4 @@
-﻿using AutoFlow.Domain.Entities;
+﻿using AutoFlow.Domain.Entidades;
 using AutoFlow.Domain.Interfacees;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,18 +14,19 @@ namespace AutoFlow.Infrastructure.Repositorios
             this.dbSet = context.Set<T>();
         }
 
-        public void Add(T item)
+        public void Adicionar(T item)
         {
             dbSet.Add(item);
 
         }
-        public async Task AddSave(T item)
+        public async Task<T> AdicionarESalvar(T item) 
         {
             try
-            {
+            { 
 
                 dbSet.Add(item);
                 await context.SaveChangesAsync();
+                return item;
             }
             catch (Exception ex)
             {
@@ -33,7 +34,7 @@ namespace AutoFlow.Infrastructure.Repositorios
                 throw new Exception(ex.Message, ex);
             }
         }
-        public async Task<bool> Delete(Guid Id)
+        public async Task<bool> Deletar(int Id)
         {
             try
             {
@@ -57,7 +58,7 @@ namespace AutoFlow.Infrastructure.Repositorios
             }
             return true;
         }
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> ObterTodos()
         {
             try
             {
@@ -70,11 +71,11 @@ namespace AutoFlow.Infrastructure.Repositorios
             }
 
         }
-        public async Task<T> GetById(Guid? Id)
+        public async Task<T> ObterPorId(int? Id)
         {
             return await dbSet.SingleOrDefaultAsync(g => g.Id.Equals(Id));
         }
-        public async Task<T> Update(T item)
+        public async Task<T> Atualizar(T item)
         {
             try
             {
@@ -104,7 +105,7 @@ namespace AutoFlow.Infrastructure.Repositorios
         {
             await context.SaveChangesAsync();
         }
-        public async Task MarkAsDeleted(T item)
+        public async Task MarcarComoDeletado(T item)
         {
             try
             {
@@ -117,7 +118,7 @@ namespace AutoFlow.Infrastructure.Repositorios
             }
 
         }
-        public async Task MarkCostAsDeleted(Guid Id)
+        public async Task MarcarComoDeletadoPorId(int Id)
         {
             try
             {

@@ -1,6 +1,9 @@
-﻿using AutoFlow.Domain.Entities;
+﻿using AutoFlow.Domain.Entidades;
 
 namespace AutoFlow.Domain.Interfacees
 {
-    public interface IClienteRepositorio : IBaseRepositorio<Cliente>{}
+    public interface IClienteRepositorio : IBaseRepositorio<Cliente>
+    {
+        Task<IEnumerable<Cliente>> ObterTodosClientesEVeiculos(); 
+    }
 }

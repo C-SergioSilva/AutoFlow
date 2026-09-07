@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using AutoFlow.Domain.Entities;
+using AutoFlow.Domain.Entidades;
 
 namespace AutoFlow.Infrastructure.Data
 {

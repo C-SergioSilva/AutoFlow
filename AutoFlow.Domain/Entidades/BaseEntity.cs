@@ -1,4 +1,4 @@
-﻿namespace AutoFlow.Domain.Entities
+﻿namespace AutoFlow.Domain.Entidades
 {
     public abstract class BaseEntity
     {

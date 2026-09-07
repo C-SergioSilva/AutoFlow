@@ -1,6 +1,6 @@
 ﻿using AutoFlow.Domain.Enum;
 
-namespace AutoFlow.Domain.Entities
+namespace AutoFlow.Domain.Entidades
 {
     public class Cliente : BaseEntity
     {

@@ -1,4 +1,4 @@
-﻿using AutoFlow.Domain.Entities;
+﻿using AutoFlow.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using System.Buffers.Text;
 
@@ -6,16 +6,16 @@ namespace AutoFlow.Domain.Interfacees
 {
     public interface IBaseRepositorio<T>  where T : BaseEntity
     {
-        void Add(T item);
-        Task AddSave(T item); 
-        Task<T> Update(T item);
-        Task<T> GetById(Guid? Id);
-        Task<IEnumerable<T>> GetAll();
-        Task<bool> Delete(Guid Id);
+        void Adicionar(T item);
+        Task<T> AdicionarESalvar(T item); 
+        Task<T> Atualizar(T item);
+        Task<T> ObterPorId(int? Id);
+        Task<IEnumerable<T>> ObterTodos();
+        Task<bool> Deletar(int Id);
         IQueryable<T> Queryable();
-        Task MarkAsDeleted(T item);
+        Task MarcarComoDeletado(T item);
         Task Commit();
-        Task MarkCostAsDeleted(Guid Id);
+        Task MarcarComoDeletadoPorId(int Id);
         DbContext GetContext();
     }
 }

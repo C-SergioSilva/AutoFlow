@@ -1,4 +1,8 @@
+using AutoFlow.Domain.Interfacees;
 using AutoFlow.Infrastructure.Data;
+using AutoFlow.Infrastructure.Repositorios;
+using AutoFlow.Service.Interface;
+using AutoFlow.Service.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
     builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+#endregion
+
+#region [Área de configuracao dos serviços] 
+
+    builder.Services.AddScoped<IVeiculoService, VeiculoService>();
+    builder.Services.AddScoped<IVeiculoRepositorio, VeiculoRepositorio>();
+
+    builder.Services.AddScoped<IClienteService, ClienteService>();
+    builder.Services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
+
 #endregion
 
 var app = builder.Build();

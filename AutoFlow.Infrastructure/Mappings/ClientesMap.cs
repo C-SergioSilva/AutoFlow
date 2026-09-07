@@ -1,4 +1,4 @@
-﻿using AutoFlow.Domain.Entities;
+﻿using AutoFlow.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
