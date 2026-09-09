@@ -8,7 +8,7 @@ namespace AutoFlow.Service.Mappings
     {
         public Mappers()
         {
-            CreateMap<ClienteVM, ClienteVM>().ReverseMap();
+            CreateMap<Cliente, ClienteVM>().ReverseMap();
             CreateMap<Veiculo, VeiculoVM>().ReverseMap();
         }
     }
