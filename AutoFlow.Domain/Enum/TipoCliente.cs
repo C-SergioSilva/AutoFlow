@@ -2,7 +2,7 @@
 {
     public enum TipoCliente
     {
-        PessoaFisica = 1,
-        PessoaJuridica = 2
+        Cpf = 1, //PessoaFisica
+        Cnpj = 2 //PessoaJuridica
     }
 }

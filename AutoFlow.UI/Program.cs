@@ -10,7 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 #region [Add services to the container]
 
     builder.Services.AddControllersWithViews();
-    builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
+
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            // Converte Enums para string automaticamente no JSON
+            options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        });
+
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
     builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion

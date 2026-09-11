@@ -20,3 +20,46 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/**
+    CSS Padrão AutoFlow - para Botões Salvar, editar. Titulo Modal, bordas de cards e cores de textos. 
+*/
+
+.color-text-padrao {
+    color: #00075a !important;
+}
+
+.btn-color-padrao {
+    background-color: #fff !important;
+    color: #00075a !important;
+    font-weight: 500 !important;
+    border-color: #00075a;
+}
+
+.btn-color-padrao:hover {
+    background-color: #00075a !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.bg-primary-modal {
+    --bs-bg-opacity: 1;
+    background-color: #094169 !important;
+}
+
+.btn-salvar-modal-padrao {
+    background-color: #fff !important;
+    color: #0a6cb6 !important;
+    font-weight: 500 !important;
+    border-color: #0a6cb6;
+}
+
+.btn-salvar-modal-padrao:hover {
+    background-color: #094169 !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+
+.border-padrao-cards {
+    border-color: #036bb5 !important;
+}

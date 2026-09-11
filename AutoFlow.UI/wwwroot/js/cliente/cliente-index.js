@@ -43,24 +43,25 @@ async function carregarClientes() {
 
         // Renderiza os tickets na tela
         clientes.forEach(cliente => {
+            console.log("Cliente recebido da API:", cliente);
             const cardDiv = document.createElement("div");
             cardDiv.className = "col-md-4 col-sm-6";
 
             cardDiv.innerHTML = `
-                <div class="card border-0 shadow-sm h-100 border-start border-primary border-4">
+                <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-bold text-dark mb-0">${cliente.nome}</h5>
-                            <span class="badge bg-light text-secondary">#${cliente.id || '0'}</span>
+                            <h5 class="card-title fw-bold color-text-padrao mb-0">${cliente.nome}</h5>
+                            <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
                         </div>
                         <p class="card-text text-muted small mb-2">
                             <i class="bi bi-whatsapp text-success me-1"></i> ${formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado'}
                         </p>
                         <p class="card-text text-muted small mb-3">
-                            <i class="bi bi-card-text text-secondary me-1"></i> Doc: ${formatarCPF(cliente.documento) || 'Não informado'}
+                           <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${formatarCPF(cliente.documento) || 'Não informado'}
                         </p>
                         <div class="d-flex justify-content-end gap-2 pt-2 border-top">
-                            <button class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-salvar-modal-padrao" title="Editar"><i class="bi bi-pencil"></i></button>
                             <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>
