@@ -67,6 +67,11 @@
                 </div>
             </nav>
 
+            <!-- Container Global para Alertas Flutuantes (Toasts/Alertas) -->
+            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+                <div id="toast-container"></div>
+            </div>
+
             <!-- Onde o conteúdo das outras telas (como a lista de clientes) é injetado -->
             <div class="container-fluid">
                 @RenderBody()

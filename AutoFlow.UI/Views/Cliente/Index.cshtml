@@ -24,7 +24,7 @@
             <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title fw-bold text-dark mb-0">Carregando clientes...</h5>
+                        <h5 class="card-title fst-italic fw-bold color-text-padrao mb-0">Carregando clientes...</h5>
                         <span class=" d-none badge bg-light text-secondary">#ID</span>
                     </div>
                     <p class="card-text text-muted small mb-2">
@@ -58,6 +58,9 @@
             </div>
             <div class="modal-body p-4">
                 <form id="formCliente">
+
+                    <input type="hidden" id="clienteId" value="">
+
                     <div class="mb-3">
                         <label for="nome" class="form-label fw-semibold text-secondary">Nome Completo / Razão Social</label>
                         <input type="text" class="form-control" id="nome" required placeholder="Ex: Oficina Mecânica Silva">
@@ -65,6 +68,14 @@
                     <div class="mb-3">
                         <label for="telefone" class="form-label fw-semibold text-secondary">Telefone / WhatsApp</label>
                         <input type="text" class="form-control" id="telefone" required placeholder="(85) 99999-9999">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipoCliente" class="form-label fw-semibold text-secondary">Tipo de Cliente</label>
+                        <select class="form-select" id="tipoCliente" required>
+                            <option value="" disabled selected>Selecione o tipo...</option>
+                            <option value="1">CPF (Pessoa Física)</option>
+                            <option value="2">CNPJ (Pessoa Jurídica)</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="documento" class="form-label fw-semibold text-secondary">Documento (CPF / CNPJ)</label>

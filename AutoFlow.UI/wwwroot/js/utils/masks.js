@@ -40,3 +40,4 @@ export function formatarTelefone(telefone) { //formatarTelefone
 
     return telefone;
 }
+
