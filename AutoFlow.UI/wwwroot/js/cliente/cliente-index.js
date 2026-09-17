@@ -1,5 +1,5 @@
 ﻿// Importando as funções direto da nossa pasta central de utilitários
-import { formatarCPF, formatarTelefone } from '/js/utils/masks.js';
+import { formatarDocumento, formatarTelefone, mascararDocumentoParcial } from '/js/utils/masks.js';
 import { mostrarAlerta } from '/js/utils/toast.js';
 
 
@@ -13,6 +13,33 @@ window.addEventListener("DOMContentLoaded", () => {
     if (btnSalvar) {
         btnSalvar.addEventListener("click", salvarCliente);
 
+    }
+
+    // 3. Configurar a máscara em tempo real no input de documento (NOVO!)
+    const inputDocumento = document.getElementById("documento");
+    const selectTipoCliente = document.getElementById("tipoCliente");
+    const inputTelefone = document.getElementById("telefone");
+    if (inputDocumento) {
+        inputDocumento.addEventListener("input", function (e) {
+
+            let valor = e.target.value;
+            let tipoAtual = selectTipoCliente ? selectTipoCliente.value : "1"; // Pega se é CPF (1) ou CNPJ (2)
+
+            if (!tipoAtual) {
+                mostrarAlerta("Por favor, selecione primeiro o tipo de cliente CPF ou CNPJ!", "warning");
+                e.target.value = ""; // Limpa o campo para evitar dados perdidos
+                return;
+            }
+
+            // Chama a função de formatação que importamos lá em cima
+            e.target.value = formatarDocumento(valor, tipoAtual);
+        });
+    }
+    if (inputTelefone) {
+        inputTelefone.addEventListener("input", function (e) {
+            let valor = e.target.value;
+            e.target.value = formatarTelefone(valor);
+        });
     }
 });
 
@@ -59,10 +86,10 @@ async function carregarClientes() {
                             <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
                         </div>
                         <p class="card-text text-muted small mb-2">
-                            <i class="bi bi-whatsapp text-success me-1"></i> ${formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado'}
+                            <i class="bi bi-whatsapp text-success me-1"></i> ${formatarDocumento(cliente.telefoneWhatsApp) || 'Não informado'}
                         </p>
                         <p class="card-text text-muted small mb-3">
-                           <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${formatarCPF(cliente.documento) || 'Não informado'}
+                           <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}
                         </p>
                         <div class="d-flex justify-content-end gap-2 pt-2 border-top">
                              
@@ -176,6 +203,9 @@ document.addEventListener("click", function (event) {
     const telefone = btnEditar.getAttribute("data-telefone");
     const documento = btnEditar.getAttribute("data-documento");
     const tipoRecebido = btnEditar.getAttribute("data-tipo");
+    const selectTipoCliente = document.getElementById("tipoCliente");
+
+    let tipoAtual = selectTipoCliente ? selectTipoCliente.value : "1"; // Pega se é CPF (1) ou CNPJ (2)
 
     // Mapeia o texto do C# para o valor numérico correspondente do nosso <select>
     let tipoValor = "1"; // padrão CPF
@@ -186,8 +216,8 @@ document.addEventListener("click", function (event) {
     // Joga os valores dentro dos inputs do modal
     document.getElementById("clienteId").value = id;
     document.getElementById("nome").value = nome;
-    document.getElementById("telefone").value = telefone;
-    document.getElementById("documento").value = documento;
+    document.getElementById("telefone").value = formatarTelefone(telefone);
+    document.getElementById("documento").value = formatarDocumento(documento, tipoValor);
     document.getElementById("tipoCliente").value = tipoValor;
 
     // Altera o título do modal opcionalmente para dar feedback ao usuário
@@ -206,6 +236,7 @@ document.addEventListener("click", function (event) {
 
 // Quando fechar ou abrir o modal para "Novo Cliente", limpa o ID e o título
 const modalClienteEl = document.getElementById('modalCliente');
+
 modalClienteEl.addEventListener('hidden.bs.modal', function () {
     document.getElementById("formCliente").reset();
     document.getElementById("clienteId").value = "";
