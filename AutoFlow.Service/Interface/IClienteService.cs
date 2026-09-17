@@ -1,4 +1,5 @@
-﻿using AutoFlow.Service.ViewsModel;
+﻿using AutoFlow.Domain.Entidades;
+using AutoFlow.Service.ViewsModel;
 
 namespace AutoFlow.Service.Interface
 {
@@ -10,6 +11,7 @@ namespace AutoFlow.Service.Interface
         Task<ClienteVM> ObterClientePorId(int Id);
         Task<ClienteVM> AtualizarCliente (ClienteVM clienteVM);
         Task StatusDeletado(int Id); 
-        Task<IEnumerable<VeiculoVM>> ObterVeiculos();  
+        Task<IEnumerable<VeiculoVM>> ObterVeiculos();
+        Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade);
     }
 }

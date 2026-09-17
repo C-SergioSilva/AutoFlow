@@ -1,5 +1,6 @@
 ﻿using AutoFlow.Domain.Entidades;
 using AutoFlow.Domain.Interfacees;
+using AutoFlow.Infrastructure.Repositorios;
 using AutoFlow.Service.Interface;
 using AutoFlow.Service.ViewsModel;
 using AutoMapper;
@@ -95,6 +96,31 @@ namespace AutoFlow.Service.Services
                 throw new Exception(ex.Message, ex);
             }
         }
+
+        public async Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade)
+        {
+            try
+            {
+                // 1. Chama o repositório que busca os dados paginados lá no banco
+                var resultadoRepositorio = await repositorio.ObterClientesPaginadosAsync(pagina, quantidade);
+
+                // 2. Usa o AutoMapper para converter a lista de Entidades (Cliente) para ViewModels (ClienteVM)
+                var listaVM = map.Map<List<ClienteVM>>(resultadoRepositorio.Items);
+
+                // 3. Monta o PagedResult final contendo os ViewModels e as regras de paginação
+                return new PagedResult<ClienteVM>
+                {
+                    Items = listaVM,
+                    PageNumber = resultadoRepositorio.PageNumber,
+                    PageSize = resultadoRepositorio.PageSize,
+                    TotalRecords = resultadoRepositorio.TotalRecords
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }   
 
         public async Task StatusDeletado(int Id)
         {
