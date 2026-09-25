@@ -1,7 +1,14 @@
 ﻿// Importando as funções direto da nossa pasta central de utilitários
 import { formatarDocumento, formatarTelefone, mascararDocumentoParcial } from '/js/utils/masks.js';
 import { mostrarAlerta } from '/js/utils/toast.js';
+import { renderizarPaginacao } from '/js/utils/paginacao.js';
 
+
+// Estado de paginação exclusivo desta tela
+const estadoPaginacao = {
+    paginaAtual: 1,
+    quantidadePorPagina: 10
+};
 
 window.addEventListener("DOMContentLoaded", () => {
     // 1. Carregar a lista de clientes assim que a página abrir
@@ -48,13 +55,17 @@ window.addEventListener("DOMContentLoaded", () => {
 // ====================================================
 async function carregarClientes() {
     try {
-        const resposta = await fetch('/api/clienteapi');
 
+        const resposta = await fetch(
+            `/api/clienteapi/paginados?pagina=${estadoPaginacao.paginaAtual}&quantidade=${estadoPaginacao.quantidadePorPagina}`
+        );
+       
         if (!resposta.ok) {
             throw new Error("Erro ao buscar os dados da API.");
         }
 
-        const clientes = await resposta.json();
+        const resultadoPaginado = await resposta.json();
+        const clientes = resultadoPaginado.items;
         const container = document.getElementById("container-clientes");
         container.innerHTML = "";
 
@@ -111,6 +122,10 @@ async function carregarClientes() {
 
             container.appendChild(cardDiv);
         });
+
+        // 🌟 RENDERIZA A PAGUNAÇÃO AQUI:
+        // Passamos os dados que vieram da API, a própria função carregarClientes e o estado atual!
+        renderizarPaginacao(resultadoPaginado, carregarClientes, estadoPaginacao, "paginacao-container01", "paginacao-container02");
 
     } catch (error) {
         console.error("Erro detalhado:", error);

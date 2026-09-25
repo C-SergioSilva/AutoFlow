@@ -36,6 +36,18 @@ body {
     border-color: #00075a;
 }
 
+.btn-page-color-padrao {
+    background-color: #fff !important;
+    color: #00075a !important;
+    font-weight: 500 !important;
+    border-color: #00075a;
+}
+
+.text-padrao-pages {
+    color: #094169 !important;
+    font-weight: 700 !important;
+}
+
 .btn-color-padrao:hover {
     background-color: #00075a !important;
     color: #fff !important;
