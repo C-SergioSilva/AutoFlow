@@ -141,27 +141,69 @@ async function carregarClientes() {
 // ====================================================
 async function salvarCliente() {
     // Pega os valores digitados nos inputs do modal
-    const id = document.getElementById("clienteId").value;
-    const nome = document.getElementById("nome").value;
-    const telefone = document.getElementById("telefone").value;
-    const documento = document.getElementById("documento").value;
-    const tipoCliente = document.getElementById("tipoCliente").value;
+    const id = document.getElementById("clienteId");
+    const nome = document.getElementById("nome");
+    const telefone = document.getElementById("telefone");
+    const documento = document.getElementById("documento");
+    const tipoCliente = document.getElementById("tipoCliente");
 
-    // Validação simples para garantir que o usuário preencheu os campos obrigatórios
-    if (!nome || !telefone || !documento || !tipoCliente) {
-        mostrarAlerta("Por favor, preencha todos os campos do formulário!", "warning");
+    let formValido = true;
+
+    // 2. Validação individual de cada campo com destaque visual (.is-invalid)
+
+    // Valida Nome
+    if (!nome.value.trim()) {
+        document.getElementById("nome").classList.add("is-invalid"); // Pinta de vermelho
+        formValido = false;
+    } else {
+        nome.classList.remove("is-invalid"); // Remove o vermelho se preencheu
+    }
+
+    // Valida Telefone
+    if (!telefone.value.trim()) {
+        telefone.classList.add("is-invalid");
+        formValido = false;
+    } else {
+        telefone.classList.remove("is-invalid");
+    }
+
+    // Valida Tipo de Cliente
+    if (!tipoCliente.value) {
+        tipoCliente.classList.add("is-invalid");
+        formValido = false;
+    } else {
+        tipoCliente.classList.remove("is-invalid");
+    }
+
+    // Valida Documento
+    if (!documento.value.trim()) {
+        documento.classList.add("is-invalid");
+        formValido = false;
+    } else {
+        documento.classList.remove("is-invalid");
+    }
+
+    // Se algum campo falhou na validação, paramos por aqui e avisamos
+    if (!formValido) {
+        mostrarAlerta("Por favor, preencha todos os campos destacados em vermelho!", "warning");
         return;
     }
+
+    // Validação simples para garantir que o usuário preencheu os campos obrigatórios
+    // if (!nome.value || !telefone.value || !documento.value || !tipoCliente.value) {
+    //     mostrarAlerta("Por favor, preencha todos os campos do formulário!", "warning");
+    //     return;
+    // }
 
     // Monta o objeto. Se o 'id' existir, mandamos ele maior que 0 para a API atualizar!
     // (Importante: os nomes das propriedades devem bater com a sua classe Cliente.cs)
 
     const clienteData = {
-        Id: id ? parseInt(id) : 0,
-        Nome: nome,
-        TelefoneWhatsApp: telefone,
-        Documento: documento,
-        Tipo: parseInt(tipoCliente)
+        Id: id.value ? parseInt(id.value) : 0,
+        Nome: nome.value,
+        TelefoneWhatsApp: telefone.value,
+        Documento: documento.value,
+        Tipo: parseInt(tipoCliente.value)
     };
 
     try {
@@ -255,6 +297,12 @@ const modalClienteEl = document.getElementById('modalCliente');
 modalClienteEl.addEventListener('hidden.bs.modal', function () {
     document.getElementById("formCliente").reset();
     document.getElementById("clienteId").value = "";
+
+    // Remove o destaque vermelho de todos os campos ao fechar o modal
+    document.querySelectorAll("#formCliente .form-control, #formCliente .form-select").forEach(el => {
+        el.classList.remove("is-invalid");
+    });
+
     const modelbtn = document.getElementById("btnSalvarCliente");
     modelbtn.innerHTML = ` Salvar Cliente`;
     document.getElementById("modalClienteLabel").innerHTML = `<i class="bi bi-person-plus-fill me-2"></i> Cadastrar Novo Cliente`;

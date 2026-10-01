@@ -43,7 +43,7 @@ export function renderizarPaginacao(dadosPaginados, funcaoCallbackCarregar, obje
 
         <div class="d-flex align-items-center mt-3 gap-3 flex-wrap">
 
-            <div class="text-muted small">
+            <div class="text-padrao-pages small">
                 Página <strong>${pageNumber}</strong> de <strong>${totalPages}</strong>
             </div>
 
@@ -51,10 +51,10 @@ export function renderizarPaginacao(dadosPaginados, funcaoCallbackCarregar, obje
             <nav>
                 <ul class="pagination pagination-sm mb-0">
                     <li class="page-item ${pageNumber === 1 ? 'disabled' : ''}">
-                        <button class="page-link" btn-page-color-padrao id="btnAnteriorGlobal" type="button">Anterior</button>
+                        <button class="page-link "  id="btnAnteriorGlobal" type="button">Anterior</button>
                     </li>
                     <li class="page-item ${pageNumber === totalPages ? 'disabled' : ''}">
-                        <button class="page-link" btn-page-color-padrao id="btnProximaGlobal" type="button">Próxima</button>
+                        <button class="page-link "  id="btnProximaGlobal" type="button">Próxima</button>
                     </li>
                 </ul>
             </nav>
