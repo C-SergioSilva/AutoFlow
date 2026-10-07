@@ -41,7 +41,6 @@ export function formatarDocumento(documento, tipoCliente) {
     return valor;
 }
     
-
 export function formatarTelefone(telefone) { //formatarTelefone
     if (!telefone) return "";
 

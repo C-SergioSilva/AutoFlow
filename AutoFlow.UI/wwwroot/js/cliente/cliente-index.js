@@ -302,107 +302,84 @@ import { renderizarPaginacao } from '/js/utils/paginacao.js';
 // FUNÇÃO PARA ABRIR OU FECHAR MODAL
 // ====================================================
 
-// Quando fechar ou abrir o modal para "Novo Cliente", limpa o ID e o título
-const modalClienteEl = document.getElementById('modalCliente');
+    // Quando fechar ou abrir o modal para "Novo Cliente", limpa o ID e o título
+    const modalClienteEl = document.getElementById('modalCliente');
 
-modalClienteEl.addEventListener('hidden.bs.modal', function () {
-    document.getElementById("formCliente").reset();
-    document.getElementById("clienteId").value = "";
+    modalClienteEl.addEventListener('hidden.bs.modal', function () {
+        document.getElementById("formCliente").reset();
+        document.getElementById("clienteId").value = "";
 
-    // Remove o destaque vermelho de todos os campos ao fechar o modal
-    document.querySelectorAll("#formCliente .form-control, #formCliente .form-select").forEach(el => {
-        el.classList.remove("is-invalid");
+        // Remove o destaque vermelho de todos os campos ao fechar o modal
+        document.querySelectorAll("#formCliente .form-control, #formCliente .form-select").forEach(el => {
+            el.classList.remove("is-invalid");
+        });
+
+        const modelbtn = document.getElementById("btnSalvarCliente");
+        modelbtn.innerHTML = ` Salvar Cliente`;
+        document.getElementById("modalClienteLabel").innerHTML = `<i class="bi bi-person-plus-fill me-2"></i> Cadastrar Novo Cliente`;
     });
-
-    const modelbtn = document.getElementById("btnSalvarCliente");
-    modelbtn.innerHTML = ` Salvar Cliente`;
-    document.getElementById("modalClienteLabel").innerHTML = `<i class="bi bi-person-plus-fill me-2"></i> Cadastrar Novo Cliente`;
-});
 
 // ====================================================
 //                  FIM DA FUNÇÃO
 // ====================================================
 
+
+                        /// 005 ///
+// ====================================================
+// FUNÇÃO PARA EXCLUSÃO DE CLIENTE COM CONFIRMAÇÃO EM MODAL
+// ====================================================
+
 // Variável global para guardar temporariamente o ID que será excluído
-let idClienteParaExcluir = null;
+    let idClienteParaExcluir = null;
 
-// 1. Quando clicar na lixeira do card
-document.addEventListener("click", function (event) {
-    const btnExcluir = event.target.closest(".btn-excluir");
-    if (!btnExcluir) return;
+    // 1. Quando clicar na lixeira do card
+    document.addEventListener("click", function (event) {
+        const btnExcluir = event.target.closest(".btn-excluir");
+        if (!btnExcluir) return;
 
-    // Guarda o ID do cliente que está nesse card
-    idClienteParaExcluir = btnExcluir.getAttribute("data-id");
+        // Guarda o ID do cliente que está nesse card
+        idClienteParaExcluir = btnExcluir.getAttribute("data-id");
 
-    // Instancia e abre o modal do Bootstrap bonitinho
-    const modalElement = document.getElementById('modalConfirmarExclusao');
-    const modalBootstrap = new bootstrap.Modal(modalElement);
-    modalBootstrap.show();
-});
-
-// 2. Quando clicar no botão de confirmação de dentro do modal
-document.getElementById("btnConfirmarExclusao").addEventListener("click", async function () {
-    if (!idClienteParaExcluir) return;
-
-    try {
-        // Dispara o DELETE para a nossa API
-        const resposta = await fetch(`/api/ClienteApi/${idClienteParaExcluir}`, {
-            method: 'DELETE'
-        });
-
-        if (!resposta.ok) {
-            throw new Error("Não foi possível excluir o cliente.");
-        }
-
-        // Fecha o modal de confirmação
+        // Instancia e abre o modal do Bootstrap bonitinho
         const modalElement = document.getElementById('modalConfirmarExclusao');
-        const modalBootstrap = bootstrap.Modal.getInstance(modalElement);
-        if (modalBootstrap) {
-            modalBootstrap.hide();
+        const modalBootstrap = new bootstrap.Modal(modalElement);
+        modalBootstrap.show();
+    });
+
+    // 2. Quando clicar no botão de confirmação de dentro do modal
+    document.getElementById("btnConfirmarExclusao").addEventListener("click", async function () {
+        if (!idClienteParaExcluir) return;
+
+        try {
+            // Dispara o DELETE para a nossa API
+            const resposta = await fetch(`/api/ClienteApi/${idClienteParaExcluir}`, {
+                method: 'DELETE'
+            });
+
+            if (!resposta.ok) {
+                throw new Error("Não foi possível excluir o cliente.");
+            }
+
+            // Fecha o modal de confirmação
+            const modalElement = document.getElementById('modalConfirmarExclusao');
+            const modalBootstrap = bootstrap.Modal.getInstance(modalElement);
+            if (modalBootstrap) {
+                modalBootstrap.hide();
+            }
+
+            // Dá o feedback de sucesso e atualiza a listagem
+            mostrarAlerta("Cliente excluído com sucesso!", "sucesso");
+            carregarClientes();
+
+        } catch (error) {
+            console.error("Erro ao excluir:", error);
+            mostrarAlerta("Erro ao tentar excluir o cliente.", "erro");
+        } finally {
+            // Limpa a variável do ID
+            idClienteParaExcluir = null;
         }
+    });
 
-        // Dá o feedback de sucesso e atualiza a listagem
-        mostrarAlerta("Cliente excluído com sucesso!", "sucesso");
-        carregarClientes();
-
-    } catch (error) {
-        console.error("Erro ao excluir:", error);
-        mostrarAlerta("Erro ao tentar excluir o cliente.", "erro");
-    } finally {
-        // Limpa a variável do ID
-        idClienteParaExcluir = null;
-    }
-});
-
-// document.addEventListener("click", async function (event) {
-//     // 1. Verifica se o elemento clicado (ou o ícone dentro dele) é o botão de excluir
-//     const btnExcluir = event.target.closest(".btn-excluir");
-//     if (!btnExcluir) return;
-
-//     // 2. Pega o ID guardado no atributo data-id do botão
-//     const id = btnExcluir.getAttribute("data-id");
-
-//     // 3. Pergunta de segurança para o usuário (Padrão Sênior de UX)
-//         if (!confirm("Tem certeza que deseja excluir este cliente?")) {
-//         return; // Se o usuário clicar em "Cancelar", paramos por aqui!
-//     }
-
-//     try {
-//         // 4. Dispara a requisição DELETE para a nossa API
-//         const resposta = await fetch(`/api/ClienteApi/${id}`, {
-//             method: 'DELETE'
-//         });
-
-//         if (!resposta.ok) {
-//             throw new Error("Não foi possível excluir o cliente.");
-//         }
-
-//         // 5. Sucesso! Mostramos um alerta e recarregamos a lista
-//         mostrarAlerta("Cliente excluído com sucesso!", "sucesso");
-//         carregarClientes(); // Atualiza a tela para o card sumir
-
-//     } catch (error) {
-//         console.error("Erro ao excluir:", error);
-//         mostrarAlerta("Erro ao tentar excluir o cliente.", "erro");
-//     }
-// });
+// ====================================================
+//                  FIM DA FUNÇÃO
+// ====================================================
