@@ -10,8 +10,9 @@ namespace AutoFlow.Service.Interface
         Task<IEnumerable<ClienteVM>> ObterTodos();
         Task<ClienteVM> ObterClientePorId(int Id);
         Task<ClienteVM> AtualizarCliente (ClienteVM clienteVM);
-        Task StatusDeletado(int Id); 
-        Task<IEnumerable<VeiculoVM>> ObterVeiculos();
+        Task StatusDeletado(int Id);
+        Task MarcarComoDeletado(ClienteVM clienteVM);
+        Task <IEnumerable<VeiculoVM>> ObterVeiculos();
         Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade);
     }
 }

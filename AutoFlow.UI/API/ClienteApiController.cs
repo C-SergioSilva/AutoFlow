@@ -78,9 +78,23 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
         {
 
             throw new Exception(ex.Message,  ex);
+        }      
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Deletar(int id)
+    {
+        try
+        {
+            // Chamamos diretamente o serviço passando o ID que veio na URL
+            await clienteService.StatusDeletado(id);
+
+            // Retornamos um status 204 (NoContent) indicando que deu tudo certo e foi excluído
+            return NoContent();
         }
-        
-        
-       
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensagem = ex.Message });
+        }
     }
 }

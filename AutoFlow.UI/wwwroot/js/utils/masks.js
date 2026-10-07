@@ -1,38 +1,41 @@
 ﻿// ==========================================
 // UTILITÁRIO GLOBAL DE MÁSCARAS E FORMATAÇÃO
 // ==========================================
-
 export function formatarDocumento(documento, tipoCliente) {
     if (!documento) return "";
 
-    // 1. Remove tudo que não for número
-    let valor = documento.replace(/\D/g, "");
+    let valor = "";
 
-    // 2. Se o tipo selecionado for CPF (tipo 1 ou string "1" ou "CPF")
+    // 1. Se o tipo selecionado for CPF (1)
     if (tipoCliente === 1 || tipoCliente === "1" || tipoCliente === "Cpf") {
-        // Trava estritamente em 11 dígitos
+        // CPF aceita estritamente números
+        valor = documento.replace(/\D/g, "");
+
         if (valor.length > 11) {
             valor = valor.substring(0, 11);
         }
-        // Aplica a máscara de CPF
+
         return valor
             .replace(/(\d{3})(\d)/, "$1.$2")
             .replace(/(\d{3})(\d)/, "$1.$2")
             .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
     }
 
-    // 3. Se o tipo selecionado for CNPJ (tipo 2 ou string "2" ou "Cnpj")
+    // 2. Se o tipo selecionado for CNPJ (2) - AGORA ALFANUMÉRICO!
     else if (tipoCliente === 2 || tipoCliente === "2" || tipoCliente === "Cnpj") {
-        // Trava estritamente em 14 dígitos
+        // Remove tudo que não for letra ou número (mantém alfanumérico) e deixa em maiúsculo para padronizar
+        valor = documento.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+
         if (valor.length > 14) {
             valor = valor.substring(0, 14);
         }
-        // Aplica a máscara de CNPJ
+
+        // Aplicamos a máscara de CNPJ aceitando letras e números ([a-zA-Z0-9])
         return valor
-            .replace(/^(\d{2})(\d)/, "$1.$2")
-            .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-            .replace(/\.(\d{3})(\d)/, ".$1/$2")
-            .replace(/(\d{4})(\d)/, "$1-$2");
+            .replace(/^([a-zA-Z0-9]{2})([a-zA-Z0-9])/, "$1.$2")
+            .replace(/^([a-zA-Z0-9]{2})\.([a-zA-Z0-9]{3})([a-zA-Z0-9])/, "$1.$2.$3")
+            .replace(/\.([a-zA-Z0-9]{3})([a-zA-Z0-9])/, ".$1/$2")
+            .replace(/([a-zA-Z0-9]{4})([a-zA-Z0-9])/, "$1-$2");
     }
 
     return valor;
@@ -75,22 +78,20 @@ export function formatarTelefone(telefone) { //formatarTelefone
 export function mascararDocumentoParcial(documento) {
     if (!documento) return "Não informado";
 
-    // Remove tudo que não for número para garantir a formatação limpa
-    const limpo = documento.replace(/\D/g, "");
+    // Se tiver tamanho de CNPJ (14), limpamos mantendo letras e números. Se for CPF (11), limpamos apenas números.
+    let limpo = "";
 
-    // Se for CPF (11 dígitos)
-    if (limpo.length === 11) {
-        // Exemplo: Esconde os 3 primeiros e os 2 últimos, ou mostra só o final
-        // Resultado visual: ***.456.654-**
+    // Verificação simples pelo tamanho bruto sem máscara (11 = CPF, 14 = CNPJ)
+    const soDigitosOuLetras = documento.replace(/[^a-zA-Z0-9]/g, "");
+
+    if (soDigitosOuLetras.length === 11) {
+        limpo = documento.replace(/\D/g, "");
         return `***.${limpo.substring(3, 6)}.${limpo.substring(6, 9)}-**`;
     }
-
-    // Se for CNPJ (14 dígitos)
-    else if (limpo.length === 14) {
-        // Resultado visual: **.***.***/0001-**
+    else if (soDigitosOuLetras.length === 14) {
+        limpo = documento.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
         return `**.***.${limpo.substring(5, 8)}/${limpo.substring(8, 12)}-**`;
     }
 
-    // Se não se encaixar em nenhum, retorna mascarado genérico
     return "***.***.***-**";
 }

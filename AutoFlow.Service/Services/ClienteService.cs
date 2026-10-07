@@ -17,7 +17,7 @@ namespace AutoFlow.Service.Services
             this.repositorio = repositorio;
         }
 
-        public async Task<ViewsModel.ClienteVM> AdicionarSalvar(ViewsModel.ClienteVM clienteVM)
+        public async Task<ClienteVM> AdicionarSalvar(ClienteVM clienteVM)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<ViewsModel.ClienteVM> AtualizarCliente(ViewsModel.ClienteVM clienteVM)
+        public async Task<ClienteVM> AtualizarCliente(ViewsModel.ClienteVM clienteVM)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<ViewsModel.ClienteVM> ObterClientePorId(int Id)
+        public async Task<ClienteVM> ObterClientePorId(int Id)
         {
             try
             {
@@ -58,12 +58,12 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<IEnumerable<ViewsModel.ClienteVM>> ObterTodos()
+        public async Task<IEnumerable<ClienteVM>> ObterTodos()
         {
             try
             {
                 var clientesEntidade = await repositorio.ObterTodos();
-                return map.Map<IEnumerable<ViewsModel.ClienteVM>>(clientesEntidade);
+                return map.Map<IEnumerable<ClienteVM>>(clientesEntidade);
             }
             catch (Exception ex)
             {
@@ -127,6 +127,19 @@ namespace AutoFlow.Service.Services
             try
             {
                 await repositorio.MarcarComoDeletadoPorId(Id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task MarcarComoDeletado(ClienteVM clienteVM)
+        {
+            try
+            {
+                var clienteEntidade = map.Map<Cliente>(clienteVM);
+                await repositorio.MarcarComoDeletado(clienteEntidade);
             }
             catch (Exception ex)
             {

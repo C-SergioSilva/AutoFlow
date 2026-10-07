@@ -97,6 +97,30 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- Modal de Confirmação de Exclusão (Padronizado) -->
+<!-- ========================================== -->
+<!--  -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalConfirmarExclusaoLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza absoluta que deseja excluir este cliente? Esta ação não poderá ser desfeita.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script type="module" src="~/js/cliente/cliente-index.js" asp-append-version="true"></script>
 }

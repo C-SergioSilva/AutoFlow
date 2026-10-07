@@ -4,142 +4,149 @@ import { mostrarAlerta } from '/js/utils/toast.js';
 import { renderizarPaginacao } from '/js/utils/paginacao.js';
 
 
-// Estado de paginação exclusivo desta tela
-const estadoPaginacao = {
-    paginaAtual: 1,
-    quantidadePorPagina: 10
-};
-
-window.addEventListener("DOMContentLoaded", () => {
-    // 1. Carregar a lista de clientes assim que a página abrir
-    carregarClientes();
-
-    // 2. Configurar o evento de clique no botão "Salvar Cliente" do Modal
-    const btnSalvar = document.getElementById("btnSalvarCliente");
-
-    if (btnSalvar) {
-        btnSalvar.addEventListener("click", salvarCliente);
-
-    }
-
-    // 3. Configurar a máscara em tempo real no input de documento (NOVO!)
-    const inputDocumento = document.getElementById("documento");
-    const selectTipoCliente = document.getElementById("tipoCliente");
-    const inputTelefone = document.getElementById("telefone");
-    if (inputDocumento) {
-        inputDocumento.addEventListener("input", function (e) {
-
-            let valor = e.target.value;
-            let tipoAtual = selectTipoCliente ? selectTipoCliente.value : "1"; // Pega se é CPF (1) ou CNPJ (2)
-
-            if (!tipoAtual) {
-                mostrarAlerta("Por favor, selecione primeiro o tipo de cliente CPF ou CNPJ!", "warning");
-                e.target.value = ""; // Limpa o campo para evitar dados perdidos
-                return;
-            }
-
-            // Chama a função de formatação que importamos lá em cima
-            e.target.value = formatarDocumento(valor, tipoAtual);
-        });
-    }
-    if (inputTelefone) {
-        inputTelefone.addEventListener("input", function (e) {
-            let valor = e.target.value;
-            e.target.value = formatarTelefone(valor);
-        });
-    }
-});
-
+                        /// 001 /// 
 // ====================================================
 // FUNÇÃO DE CARREGAR CLIENTES (GET)
 // ====================================================
-async function carregarClientes() {
-    try {
 
-        const resposta = await fetch(
-            `/api/clienteapi/paginados?pagina=${estadoPaginacao.paginaAtual}&quantidade=${estadoPaginacao.quantidadePorPagina}`
-        );
+// Estado de paginação exclusivo desta tela
+    const estadoPaginacao = {
+        paginaAtual: 1,
+        quantidadePorPagina: 10
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+        // 1. Carregar a lista de clientes assim que a página abrir
+        carregarClientes();
+
+        // 2. Configurar o evento de clique no botão "Salvar Cliente" do Modal
+        const btnSalvar = document.getElementById("btnSalvarCliente");
+
+        if (btnSalvar) {
+            btnSalvar.addEventListener("click", salvarCliente);
+
+        }
+
+        // 3. Configurar a máscara em tempo real no input de documento (NOVO!)
+        const inputDocumento = document.getElementById("documento");
+        const selectTipoCliente = document.getElementById("tipoCliente");
+        const inputTelefone = document.getElementById("telefone");
+        if (inputDocumento) {
+            inputDocumento.addEventListener("input", function (e) {
+
+                let valor = e.target.value;
+                let tipoAtual = selectTipoCliente ? selectTipoCliente.value : "1"; // Pega se é CPF (1) ou CNPJ (2)
+
+                if (!tipoAtual) {
+                    mostrarAlerta("Por favor, selecione primeiro o tipo de cliente CPF ou CNPJ!", "warning");
+                    e.target.value = ""; // Limpa o campo para evitar dados perdidos
+                    return;
+                }
+
+                // Chama a função de formatação que importamos lá em cima
+                e.target.value = formatarDocumento(valor, tipoAtual);
+            });
+        }
+        if (inputTelefone) {
+            inputTelefone.addEventListener("input", function (e) {
+                let valor = e.target.value;
+                e.target.value = formatarTelefone(valor);
+            });
+        }
+    });
+
+    async function carregarClientes() {
+        try {
+
+            const resposta = await fetch(
+                `/api/clienteapi/paginados?pagina=${estadoPaginacao.paginaAtual}&quantidade=${estadoPaginacao.quantidadePorPagina}`
+            );
        
-        if (!resposta.ok) {
-            throw new Error("Erro ao buscar os dados da API.");
-        }
+            if (!resposta.ok) {
+                throw new Error("Erro ao buscar os dados da API.");
+            }
 
-        const resultadoPaginado = await resposta.json();
-        const clientes = resultadoPaginado.items;
-        const container = document.getElementById("container-clientes");
-        container.innerHTML = "";
+            const resultadoPaginado = await resposta.json();
+            const clientes = resultadoPaginado.items;
+            const container = document.getElementById("container-clientes");
+            container.innerHTML = "";
 
-        // Validação se a lista estiver vazia
-        if (!clientes || clientes.length === 0) {
-            container.innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <div class="text-muted">
-                        <i class="bi bi-folder2-open display-4 mb-3 d-block"></i>
-                        <h5>Nenhum cliente cadastrado ainda.</h5>
-                        <p class="small">Clique no botão "Novo Cliente" acima para começar a cadastrar.</p>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        // Renderiza os tickets na tela
-        clientes.forEach(cliente => {
-            console.log("Cliente recebido da API:", cliente);
-            const cardDiv = document.createElement("div");
-            cardDiv.className = "col-md-4 col-sm-6";
-
-            cardDiv.innerHTML = `
-                <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-bold color-text-padrao mb-0">${cliente.nome}</h5>
-                            <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
+            // Validação se a lista estiver vazia
+            if (!clientes || clientes.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="text-muted">
+                            <i class="bi bi-folder2-open display-4 mb-3 d-block"></i>
+                            <h5>Nenhum cliente cadastrado ainda.</h5>
+                            <p class="small">Clique no botão "Novo Cliente" acima para começar a cadastrar.</p>
                         </div>
-                        <p class="card-text text-muted small mb-2">
-                            <i class="bi bi-whatsapp text-success me-1"></i> ${formatarDocumento(cliente.telefoneWhatsApp) || 'Não informado'}
-                        </p>
-                        <p class="card-text text-muted small mb-3">
-                           <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}
-                        </p>
-                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                    </div>
+                `;
+                return;
+            }
+
+            // Renderiza os tickets na tela
+            clientes.forEach(cliente => {
+                console.log("Cliente recebido da API:", cliente);
+                const cardDiv = document.createElement("div");
+                cardDiv.className = "col-md-4 col-sm-6";
+
+                cardDiv.innerHTML = `
+                    <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold color-text-padrao mb-0">${cliente.nome}</h5>
+                                <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
+                            </div>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="bi bi-whatsapp text-success me-1"></i> ${formatarDocumento(cliente.telefoneWhatsApp) || 'Não informado'}
+                            </p>
+                            <p class="card-text text-muted small mb-3">
+                               <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}
+                            </p>
+                            <div class="d-flex justify-content-end gap-2 pt-2 border-top">
                              
-                        <button class="btn btn-sm btn-salvar-modal-padrao btn-editar"
-                                title="Editar"
-                                data-id="${cliente.id}"
-                                data-nome="${cliente.nome}"
-                                data-telefone="${cliente.telefoneWhatsApp}"
-                                data-documento="${cliente.documento}"
-                                data-tipo="${cliente.tipo}">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-
-                            <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-sm btn-salvar-modal-padrao btn-editar"
+                                    title="Editar"
+                                    data-id="${cliente.id}"
+                                    data-nome="${cliente.nome}"
+                                    data-telefone="${cliente.telefoneWhatsApp}"
+                                    data-documento="${cliente.documento}"
+                                    data-tipo="${cliente.tipo}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                                <button class="btn btn-sm btn-outline-danger btn-excluir" 
+                                    title="Excluir"
+                                    data-id="${cliente.id}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            container.appendChild(cardDiv);
-        });
+                container.appendChild(cardDiv);
+            });
 
-        // 🌟 RENDERIZA A PAGUNAÇÃO AQUI:
-        // Passamos os dados que vieram da API, a própria função carregarClientes e o estado atual!
-        renderizarPaginacao(resultadoPaginado, carregarClientes, estadoPaginacao, "paginacao-container01", "paginacao-container02");
+            // 🌟 RENDERIZA A PAGUNAÇÃO AQUI:
+            // Passamos os dados que vieram da API, a própria função carregarClientes e o estado atual!
+            renderizarPaginacao(resultadoPaginado, carregarClientes, estadoPaginacao, "paginacao-container01", "paginacao-container02");
 
-    } catch (error) {
-        console.error("Erro detalhado:", error);
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+        }
     }
-}
 
 // ====================================================
 //                  FIM DA FUNÇÃO
 // ====================================================
 
+
+                        /// 002 /// 
 // ====================================================
 // FUNÇÃO DE CADASTRAR NOVO CLIENTE (POST)
 // ====================================================
-async function salvarCliente() {
+    async function salvarCliente() {
     // Pega os valores digitados nos inputs do modal
     const id = document.getElementById("clienteId");
     const nome = document.getElementById("nome");
@@ -189,15 +196,6 @@ async function salvarCliente() {
         return;
     }
 
-    // Validação simples para garantir que o usuário preencheu os campos obrigatórios
-    // if (!nome.value || !telefone.value || !documento.value || !tipoCliente.value) {
-    //     mostrarAlerta("Por favor, preencha todos os campos do formulário!", "warning");
-    //     return;
-    // }
-
-    // Monta o objeto. Se o 'id' existir, mandamos ele maior que 0 para a API atualizar!
-    // (Importante: os nomes das propriedades devem bater com a sua classe Cliente.cs)
-
     const clienteData = {
         Id: id.value ? parseInt(id.value) : 0,
         Nome: nome.value,
@@ -244,11 +242,14 @@ async function salvarCliente() {
 //                  FIM DA FUNÇÃO
 // ====================================================
 
+
+
+                       /// 003 /// 
 // ====================================================
 // FUNÇÃO PARA PREPARAR A EDIÇÃO DO CLIENTE
 // ====================================================
 
-document.addEventListener("click", function (event) {
+    document.addEventListener("click", function (event) {
 
     // Verifica se o elemento clicado (ou o ícone dentro dele) é o botão de editar
     const btnEditar = event.target.closest(".btn-editar");
@@ -291,6 +292,16 @@ document.addEventListener("click", function (event) {
     modalInstance.show();
 });
 
+// ====================================================
+//                  FIM DA FUNÇÃO
+// ====================================================
+
+
+                        /// 004 ///
+// ====================================================
+// FUNÇÃO PARA ABRIR OU FECHAR MODAL
+// ====================================================
+
 // Quando fechar ou abrir o modal para "Novo Cliente", limpa o ID e o título
 const modalClienteEl = document.getElementById('modalCliente');
 
@@ -309,5 +320,89 @@ modalClienteEl.addEventListener('hidden.bs.modal', function () {
 });
 
 // ====================================================
-//                  FIM DA FUNÇÃO 
+//                  FIM DA FUNÇÃO
 // ====================================================
+
+// Variável global para guardar temporariamente o ID que será excluído
+let idClienteParaExcluir = null;
+
+// 1. Quando clicar na lixeira do card
+document.addEventListener("click", function (event) {
+    const btnExcluir = event.target.closest(".btn-excluir");
+    if (!btnExcluir) return;
+
+    // Guarda o ID do cliente que está nesse card
+    idClienteParaExcluir = btnExcluir.getAttribute("data-id");
+
+    // Instancia e abre o modal do Bootstrap bonitinho
+    const modalElement = document.getElementById('modalConfirmarExclusao');
+    const modalBootstrap = new bootstrap.Modal(modalElement);
+    modalBootstrap.show();
+});
+
+// 2. Quando clicar no botão de confirmação de dentro do modal
+document.getElementById("btnConfirmarExclusao").addEventListener("click", async function () {
+    if (!idClienteParaExcluir) return;
+
+    try {
+        // Dispara o DELETE para a nossa API
+        const resposta = await fetch(`/api/ClienteApi/${idClienteParaExcluir}`, {
+            method: 'DELETE'
+        });
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível excluir o cliente.");
+        }
+
+        // Fecha o modal de confirmação
+        const modalElement = document.getElementById('modalConfirmarExclusao');
+        const modalBootstrap = bootstrap.Modal.getInstance(modalElement);
+        if (modalBootstrap) {
+            modalBootstrap.hide();
+        }
+
+        // Dá o feedback de sucesso e atualiza a listagem
+        mostrarAlerta("Cliente excluído com sucesso!", "sucesso");
+        carregarClientes();
+
+    } catch (error) {
+        console.error("Erro ao excluir:", error);
+        mostrarAlerta("Erro ao tentar excluir o cliente.", "erro");
+    } finally {
+        // Limpa a variável do ID
+        idClienteParaExcluir = null;
+    }
+});
+
+// document.addEventListener("click", async function (event) {
+//     // 1. Verifica se o elemento clicado (ou o ícone dentro dele) é o botão de excluir
+//     const btnExcluir = event.target.closest(".btn-excluir");
+//     if (!btnExcluir) return;
+
+//     // 2. Pega o ID guardado no atributo data-id do botão
+//     const id = btnExcluir.getAttribute("data-id");
+
+//     // 3. Pergunta de segurança para o usuário (Padrão Sênior de UX)
+//         if (!confirm("Tem certeza que deseja excluir este cliente?")) {
+//         return; // Se o usuário clicar em "Cancelar", paramos por aqui!
+//     }
+
+//     try {
+//         // 4. Dispara a requisição DELETE para a nossa API
+//         const resposta = await fetch(`/api/ClienteApi/${id}`, {
+//             method: 'DELETE'
+//         });
+
+//         if (!resposta.ok) {
+//             throw new Error("Não foi possível excluir o cliente.");
+//         }
+
+//         // 5. Sucesso! Mostramos um alerta e recarregamos a lista
+//         mostrarAlerta("Cliente excluído com sucesso!", "sucesso");
+//         carregarClientes(); // Atualiza a tela para o card sumir
+
+//     } catch (error) {
+//         console.error("Erro ao excluir:", error);
+//         mostrarAlerta("Erro ao tentar excluir o cliente.", "erro");
+//     }
+// });
