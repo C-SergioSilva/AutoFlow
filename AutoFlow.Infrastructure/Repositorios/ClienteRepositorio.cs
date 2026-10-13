@@ -1,4 +1,5 @@
 ﻿using AutoFlow.Domain.Entidades;
+using AutoFlow.Domain.Enum;
 using AutoFlow.Domain.Interfacees;
 using AutoFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -16,20 +17,32 @@ namespace AutoFlow.Infrastructure.Repositorios
                 .ToListAsync();
         }
 
-        public async Task<PagedResult<Cliente>> ObterClientesPaginadosAsync(int pagina, int quantidade)
+        public async Task<PagedResult<Cliente>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento)
         {
+            // 1. Limpa a máscara do documento caso ele venha preenchido (deixa apenas números/letras puros para bater com o banco)
+            string documentoLimpo = string.IsNullOrEmpty(documento)
+            ? null
+            : new string(documento.Where(char.IsLetterOrDigit).ToArray());
+
             // PASSO 1: Perguntar ao banco quantos registros existem no total
-            int totalRegistros = await Queryable().CountAsync();
+            int totalRegistros = await Queryable()
+                .Where(c => (string.IsNullOrEmpty(nome) || c.Nome.Contains(nome)) &&
+                            (!tipoDocumento.HasValue || c.Tipo == (TipoCliente)tipoDocumento.Value) &&
+                            (string.IsNullOrEmpty(documentoLimpo) || c.Documento.Contains(documentoLimpo)))
+                .CountAsync();
 
             // PASSO 2: Buscar apenas a fatia (página) que o usuário quer ver
             var clientesDaPagina = await Queryable()
-                .Include(c => c.Veiculos)       // Traz os veículos do cliente junto (sua regra de negócio)
-                .OrderBy(c => c.Nome)           // IMPORTANTE: Ordena em ordem alfabética para o salto funcionar direito
-                .Skip((pagina - 1) * quantidade)// Pula os registros das páginas anteriores
-                .Take(quantidade)               // Pega apenas a quantidade exata que o usuário pediu (ex: 10)
-                .ToListAsync();                 // AGORA SIM! Executa o comando no banco e traz só esses 10 para a memória!
-
-            // PASSO 3: Empacotar tudo e devolver
+                .Where(c => (string.IsNullOrEmpty(nome) || c.Nome.Contains(nome)) &&
+                            (!tipoDocumento.HasValue || c.Tipo == (TipoCliente)tipoDocumento.Value) &&
+                            (string.IsNullOrEmpty(documentoLimpo) || c.Documento.Contains(documentoLimpo)))
+                .Include(c => c.Veiculos)        // Traz os veículos do cliente junto (sua regra de negócio)   
+                .OrderBy(c => c.Nome)            // IMPORTANTE: Ordena em ordem alfabética para o salto funcionar direito       
+                .Skip((pagina - 1) * quantidade) // Pula os registros das páginas anteriores
+                .Take(quantidade)                // Pega apenas a quantidade exata que o usuário pediu (ex: 10)
+                .ToListAsync();                  
+                                                
+            // PASSO 3: Empacotar tudo e devolve // AGORA SIM! Executa o comando no banco e traz só esses 10 para a memória!r
             return new PagedResult<Cliente>
             {
                 Items = clientesDaPagina,

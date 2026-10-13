@@ -13,6 +13,6 @@ namespace AutoFlow.Service.Interface
         Task StatusDeletado(int Id);
         Task MarcarComoDeletado(ClienteVM clienteVM);
         Task <IEnumerable<VeiculoVM>> ObterVeiculos();
-        Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade);
+        Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento);
     }
 }

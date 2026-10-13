@@ -15,10 +15,17 @@ export function formatarDocumento(documento, tipoCliente) {
             valor = valor.substring(0, 11);
         }
 
-        return valor
-            .replace(/(\d{3})(\d)/, "$1.$2")
-            .replace(/(\d{3})(\d)/, "$1.$2")
-            .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        // Formatação progressiva segura para o CPF
+        let resultado = valor;
+        if (valor.length > 3 && valor.length <= 6) {
+            resultado = valor.replace(/(\d{3})(\d+)/, "$1.$2");
+        } else if (valor.length > 6 && valor.length <= 9) {
+            resultado = valor.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
+        } else if (valor.length > 9) {
+            resultado = valor.replace(/(\d{3})(\d{3})(\d{3})(\d+)/, "$1.$2.$3-$4");
+        }
+
+        return resultado;
     }
 
     // 2. Se o tipo selecionado for CNPJ (2) - AGORA ALFANUMÉRICO!
@@ -31,11 +38,18 @@ export function formatarDocumento(documento, tipoCliente) {
         }
 
         // Aplicamos a máscara de CNPJ aceitando letras e números ([a-zA-Z0-9])
-        return valor
-            .replace(/^([a-zA-Z0-9]{2})([a-zA-Z0-9])/, "$1.$2")
-            .replace(/^([a-zA-Z0-9]{2})\.([a-zA-Z0-9]{3})([a-zA-Z0-9])/, "$1.$2.$3")
-            .replace(/\.([a-zA-Z0-9]{3})([a-zA-Z0-9])/, ".$1/$2")
-            .replace(/([a-zA-Z0-9]{4})([a-zA-Z0-9])/, "$1-$2");
+        let resultado = valor;
+        if (valor.length > 2 && valor.length <= 5) {
+            resultado = valor.replace(/^([a-zA-Z0-9]{2})([a-zA-Z0-9]+)/, "$1.$2");
+        } else if (valor.length > 5 && valor.length <= 8) {
+            resultado = valor.replace(/^([a-zA-Z0-9]{2})([a-zA-Z0-9]{3})([a-zA-Z0-9]+)/, "$1.$2.$3");
+        } else if (valor.length > 8 && valor.length <= 12) {
+            resultado = valor.replace(/^([a-zA-Z0-9]{2})([a-zA-Z0-9]{3})([a-zA-Z0-9]{3})([a-zA-Z0-9]+)/, "$1.$2.$3/$4");
+        } else if (valor.length > 12) {
+            resultado = valor.replace(/^([a-zA-Z0-9]{2})([a-zA-Z0-9]{3})([a-zA-Z0-9]{3})([a-zA-Z0-9]{4})([a-zA-Z0-9]+)/, "$1.$2.$3/$4-$5");
+        }
+
+        return resultado;
     }
 
     return valor;

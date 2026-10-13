@@ -43,6 +43,18 @@ body {
     border-color: #00075a;
 }
 
+.btn-padrao-secondary {
+    background-color: #fff !important;
+    font-weight: 500 !important;
+    color: #6c757d;
+    border-color: #00075a;
+} 
+.form-page-color-padrao {
+    color: #00075a !important;
+    font-weight: 500 !important;
+    border-color: #00075a;
+}
+
 .btn-page-color-padrao {
     background-color: #fff !important;
     color: #075994 !important;

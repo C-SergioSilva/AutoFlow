@@ -32,7 +32,8 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
     }
 
     [HttpGet("paginados")] // Rota que nossa tela vai chamar: /api/cliente/paginados?pagina=1&quantidade=10
-    public async Task<IActionResult> ObterClientesPaginados([FromQuery] int pagina = 1, [FromQuery] int quantidade = 10)
+    public async Task<IActionResult> ObterClientesPaginados([FromQuery] int pagina = 1,[FromQuery] int quantidade = 10,[FromQuery] string nome = null,
+    [FromQuery] int? tipoDocumento = null, [FromQuery] string documento = null)
     {
         try
         {
@@ -41,7 +42,7 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
             if (quantidade < 1) quantidade = 10;
 
             // 2. Chama o serviço que criamos agora pouco
-            var resultadoPaginado = await clienteService.ObterClientesPaginadosAsync(pagina, quantidade);
+            var resultadoPaginado = await clienteService.ObterClientesPaginadosAsync(pagina, quantidade, nome, tipoDocumento, documento);
 
             // 3. Retorna o resultado com sucesso (HTTP 200) contendo nossos dados e metadados
             return Ok(resultadoPaginado);

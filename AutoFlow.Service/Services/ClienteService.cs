@@ -97,12 +97,12 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade)
+        public async Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento)
         {
             try
             {
                 // 1. Chama o repositório que busca os dados paginados lá no banco
-                var resultadoRepositorio = await repositorio.ObterClientesPaginadosAsync(pagina, quantidade);
+                var resultadoRepositorio = await repositorio.ObterClientesPaginadosAsync(pagina, quantidade, nome, tipoDocumento, documento);
 
                 // 2. Usa o AutoMapper para converter a lista de Entidades (Cliente) para ViewModels (ClienteVM)
                 var listaVM = map.Map<List<ClienteVM>>(resultadoRepositorio.Items);
