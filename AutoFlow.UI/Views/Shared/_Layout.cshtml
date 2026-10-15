@@ -22,27 +22,31 @@
                 <i class="bi bi-car-front-fill fs-4 me-2 text-primary"></i>
                 <span>AUTOFLOW SaaS</span>
             </div>
+            <!-- 🌟 NOVO: Botão de Recolher/Expandir o Menu -->
+            <button id="btnToggleMenu" class="btn btn-sm text-white p-0 border-0" title="Recolher/Expandir Menu">
+                <i class="bi bi-list fs-4"></i>
+            </button>
 
             <ul class="list-unstyled components">
-                <li class="text-muted px-3 small fw-bold text-uppercase mb-2">Painel Principal</li>
+                <li class="text-muted px-3 small fw-bold text-uppercase mb-2 menu-text">Painel Principal</li>
                 <li>
-                    <a asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+                    <a asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-2 menu-text"></i> Dashboard</a>
                 </li>
 
-                <li class="text-muted px-3 small fw-bold text-uppercase mt-4 mb-2">Cadastros</li>
+                <li class="text-muted px-3 small fw-bold text-uppercase mt-4 mb-2 menu-text">Cadastros</li>
                 <li>
-                    <a asp-controller="Cliente" asp-action="Index"><i class="bi bi-people-fill me-2"></i> Clientes</a>
+                    <a asp-controller="Cliente" asp-action="Index"><i class="bi bi-people-fill me-2 menu-text"></i> Clientes</a>
                 </li>
                 <li>
-                    <a href="#"><i class="bi bi-truck me-2"></i> Veículos</a>
+                    <a href="#"><i class="bi bi-truck me-2 menu-text"></i> Veículos</a>
                 </li>
                 <li>
-                    <a href="#"><i class="bi bi-tools me-2"></i> Serviços</a>
+                    <a href="#"><i class="bi bi-tools me-2 menu-text"></i> Serviços</a>
                 </li>
 
-                <li class="text-muted px-3 small fw-bold text-uppercase mt-4 mb-2">Sistema</li>
+                <li class="text-muted px-3 small fw-bold text-uppercase mt-4 mb-2 menu-text">Sistema</li>
                 <li>
-                    <a asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-lock me-2"></i> Privacidade</a>
+                    <a asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-lock me-2 menu-text"></i> Privacidade</a>
                 </li>
             </ul>
         </nav>

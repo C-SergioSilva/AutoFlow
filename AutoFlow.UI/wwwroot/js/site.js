@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿document.addEventListener("click", function (e) {
+    // 1. Se clicar no botão/ícone de recolher/expandir o menu
+    const btnToggle = e.target.closest("#btnToggleMenu");
+    if (btnToggle) {
+        document.body.classList.toggle("menu-recolhido");
+        return;
+    }
 
-// Write your JavaScript code.
+    // 2. Se o menu estiver recolhido e o usuário clicar em qualquer lugar DENTRO dele, ele expanda novamente
+    const sidebar = e.target.closest("#sidebar");
+    if (sidebar && document.body.classList.contains("menu-recolhido")) {
+        document.body.classList.remove("menu-recolhido");
+    }
+});

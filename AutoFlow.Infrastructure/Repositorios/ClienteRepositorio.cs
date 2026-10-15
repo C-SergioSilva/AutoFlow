@@ -3,6 +3,7 @@ using AutoFlow.Domain.Enum;
 using AutoFlow.Domain.Interfacees;
 using AutoFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace AutoFlow.Infrastructure.Repositorios
 {
@@ -20,9 +21,8 @@ namespace AutoFlow.Infrastructure.Repositorios
         public async Task<PagedResult<Cliente>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento)
         {
             // 1. Limpa a máscara do documento caso ele venha preenchido (deixa apenas números/letras puros para bater com o banco)
-            string documentoLimpo = string.IsNullOrEmpty(documento)
-            ? null
-            : new string(documento.Where(char.IsLetterOrDigit).ToArray());
+
+            var documentoLimpo = Limpardocumento(documento);
 
             // PASSO 1: Perguntar ao banco quantos registros existem no total
             int totalRegistros = await Queryable()
@@ -51,6 +51,18 @@ namespace AutoFlow.Infrastructure.Repositorios
                 TotalRecords = totalRegistros
             };
         }
+
+        public string Limpardocumento(string documento)
+        {
+            // Se o documento veio preenchido, removemos tudo o que não for letra ou número 
+            // (Isso garante que pontos, traços, barras e espaços voem pelo ar e fique só o valor puro!)
+            if (!string.IsNullOrEmpty(documento))
+            {
+                documento = new string(documento.Where(char.IsLetterOrDigit).ToArray());
+            }
+
+            return documento;
+        } 
 
 
     }

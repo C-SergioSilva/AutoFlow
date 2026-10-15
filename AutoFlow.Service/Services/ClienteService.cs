@@ -21,9 +21,13 @@ namespace AutoFlow.Service.Services
         {
             try
             {
+                // Se o documento veio preenchido, removemos tudo o que não for letra ou número 
+                // (Isso garante que pontos, traços, barras e espaços voem pelo ar e fique só o valor puro!)
+                clienteVM.Documento = repositorio.Limpardocumento(clienteVM.Documento);
+                
                 var clienteEntidade = map.Map<Domain.Entidades.Cliente>(clienteVM);
                 var clienteAdicionado = await repositorio.AdicionarESalvar(clienteEntidade);
-                return map.Map<ViewsModel.ClienteVM>(clienteAdicionado);
+                return map.Map<ClienteVM>(clienteAdicionado);
             }
             catch (Exception ex)
             {
@@ -31,13 +35,14 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<ClienteVM> AtualizarCliente(ViewsModel.ClienteVM clienteVM)
+        public async Task<ClienteVM> AtualizarCliente(ClienteVM clienteVM)
         {
             try
             {
+                clienteVM.Documento = repositorio.Limpardocumento(clienteVM.Documento);
                 var clienteEntidade = map.Map<Domain.Entidades.Cliente>(clienteVM);
                 var clienteAtualizado = await repositorio.Atualizar(clienteEntidade);
-                return map.Map<ViewsModel.ClienteVM>(clienteAtualizado);
+                return map.Map<ClienteVM>(clienteAtualizado);
             }
             catch (Exception ex)
             {
@@ -50,7 +55,7 @@ namespace AutoFlow.Service.Services
             try
             {
                 var clienteEntidade = await repositorio.ObterPorId(Id);
-                return map.Map<ViewsModel.ClienteVM>(clienteEntidade);
+                return map.Map<ClienteVM>(clienteEntidade);
             }
             catch (Exception ex)
             {
@@ -71,7 +76,7 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<IEnumerable<ViewsModel.ClienteVM>> ObterTodosClientesEVeiculos()
+        public async Task<IEnumerable<ClienteVM>> ObterTodosClientesEVeiculos()
         {
             try
             {
@@ -146,5 +151,6 @@ namespace AutoFlow.Service.Services
                 throw new Exception(ex.Message, ex);
             }
         }
+
     }
 }

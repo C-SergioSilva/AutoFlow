@@ -213,7 +213,7 @@ function executarPesquisaCombinada() {
                                     <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
                                 </div>
                                 <p class="card-text text-muted small mb-2">
-                                    <i class="bi bi-whatsapp text-success me-1"></i> ${formatarDocumento(cliente.telefoneWhatsApp) || 'Não informado'}
+                                    <i class="bi bi-whatsapp text-success me-1"></i> ${formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado'}
                                 </p>
                                 <p class="card-text text-muted small mb-3">
                                    <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}

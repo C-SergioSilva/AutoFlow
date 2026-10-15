@@ -6,5 +6,7 @@ namespace AutoFlow.Domain.Interfacees
     {
         Task<IEnumerable<Cliente>> ObterTodosClientesEVeiculos();
         Task<PagedResult<Cliente>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento);
+        string Limpardocumento(string documento);
+
     }
 }
