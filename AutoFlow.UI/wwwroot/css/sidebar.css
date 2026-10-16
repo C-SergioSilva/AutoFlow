@@ -10,36 +10,15 @@ body {
     align-items: stretch;
 }
 
-#sidebar {
-    min-width: 260px;
-    max-width: 260px;
-    background: #00075a;
-    color: #fff;
-    transition: all 0.3s;
-    min-height: 100vh;
+#sidebar ul li a {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: block;
+    color: #cfd8dc;
+    text-decoration: none;
+    transition: 0.2s;
 }
-
-    #sidebar .sidebar-header {
-        padding: 20px;
-        background: #020b7f;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-
-
-#sidebar ul.components {
-    padding: 20px 0;
-}
-
-    #sidebar ul li a {
-        padding: 12px 20px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        display: block;
-        color: #cfd8dc;
-        text-decoration: none;
-        transition: 0.2s;
-    }
 
 #sidebar ul li a:hover {
     color: #fff;
@@ -52,3 +31,130 @@ body {
     padding: 20px;
     min-height: 100vh;
 }
+/********************************************************************/
+
+
+/* ==========================================
+   ESTILOS DA BARRA LATERAL (SIDEBAR PROFISSIONAL)
+   ========================================== */
+
+/* Estrutura principal da Sidebar */
+#sidebar {
+    min-width: 260px;
+    max-width: 260px;
+    min-height: 100vh;
+    height: 100%;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: width 0.3s ease-in-out;
+    background-color: #031b33; /* Cor azul escuro padrão do seu painel */
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #00075a;
+    color: #fff;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #020b7f;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #020b7f;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Quando o menu for recolhido via botão, ele encolhe estritamente para 70px */
+body.menu-recolhido #sidebar {
+    min-width: 70px;
+    max-width: 70px;
+}
+
+/* Esconde os textos dos menus e os títulos de seção quando recolhido */
+body.menu-recolhido #sidebar .menu-text,
+body.menu-recolhido #sidebar li.text-muted {
+    display: none !important;
+}
+
+/* Alinha os links e centraliza os ícones perfeitamente no modo recolhido */
+body.menu-recolhido #sidebar a {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 12px 0 !important;
+    white-space: nowrap !important;
+}
+
+/* Remove margens extras dos ícones quando recolhido para não torturar o alinhamento */
+body.menu-recolhido #sidebar a i {
+    margin-right: 0 !important;
+    font-size: 1.4rem !important;
+}
+
+/* O Cabeçalho da Sidebar (Logo e Botão) no modo recolhido */
+body.menu-recolhido #sidebar .sidebar-header span {
+    display: none !important;
+}
+
+body.menu-recolhido #sidebar .sidebar-header {
+    justify-content: center !important;
+    padding: 15px 0 !important;
+}
+
+/* 🌟 A MÁGICA DO HOVER: Quando o mouse passa por cima da barra recolhida, ela expande suavemente! */
+body.menu-recolhido #sidebar:hover {
+    min-width: 260px !important;
+    max-width: 260px !important;
+}
+
+body.menu-recolhido #sidebar:hover .menu-text,
+body.menu-recolhido #sidebar:hover li.text-muted {
+    display: block !important;
+}
+
+body.menu-recolhido #sidebar:hover a {
+    justify-content: flex-start !important;
+    padding-left: 1.25rem !important;
+}
+
+body.menu-recolhido #sidebar:hover a i {
+    margin-right: 0.75rem !important;
+}
+
+body.menu-recolhido #sidebar:hover .sidebar-header {
+justify-content: space-between !important;
+padding: 15px !important;
+}
+
+body.menu-recolhido #sidebar:hover .sidebar-header span {
+    display: inline !important;
+}
+
+/* Remove qualquer foco feio ou persistente do botão do menu ao clicar */
+#btnToggleMenu:focus,
+#btnToggleMenu:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Enquanto a trava de clique estiver ativa, o hover não expande a barra */
+body.menu-recolhido #sidebar.travar-hover {
+    min-width: 70px !important;
+    max-width: 70px !important;
+}
+
+/* Garante que os textos continuem sumidos durante a trava */
+body.menu-recolhido #sidebar.travar-hover .menu-text,
+body.menu-recolhido #sidebar.travar-hover li.text-muted {
+    display: none !important;
+}
+
+
+
+/**************************************************************/

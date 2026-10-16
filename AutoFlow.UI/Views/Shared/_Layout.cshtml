@@ -18,39 +18,59 @@
     <div class="wrapper">
         <!-- BARRA LATERAL (SIDEBAR) -->
         <nav id="sidebar">
-            <div class="sidebar-header d-flex align-items-center">
-                <i class="bi bi-car-front-fill fs-4 me-2 text-primary"></i>
-                <span>AUTOFLOW SaaS</span>
+            <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+                <div class="d-flex align-items-center overflow-hidden">
+                    <i class="bi bi-car-front-fill fs-4 me-2 text-primary flex-shrink-0"></i>
+                    <span class="menu-text fw-bold text-white text-nowrap">AUTOFLOW SaaS</span>
+                </div>
             </div>
-            <!-- 🌟 NOVO: Botão de Recolher/Expandir o Menu -->
-            <button id="btnToggleMenu" class="btn btn-sm text-white p-0 border-0" title="Recolher/Expandir Menu">
-                <i class="bi bi-list fs-4"></i>
-            </button>
 
-            <ul class="list-unstyled components">
-                <li class="text-muted px-3 small fw-bold text-uppercase mb-2 menu-text">Painel Principal</li>
-                <li>
-                    <a asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-2 menu-text"></i> Dashboard</a>
-                </li>
+            <!-- Botão de Recolher/Expandir o Menu -->
+            <div class="mt-3 mb-3 px-3 mb-2">
+                <button id="btnToggleMenu" class="btn btn-sm text-white p-0 border-0" title="Recolher/Expandir Menu">
+                    <i class="bi bi-list fs-4"></i>
+                    <span class="menu-text ms-2 text-nowrap"> Recolher/Expandir Menu </span>
+                </button>
+            </div>
 
-                <li class="text-muted px-3 small fw-bold text-uppercase mt-4 mb-2 menu-text">Cadastros</li>
-                <li>
-                    <a asp-controller="Cliente" asp-action="Index"><i class="bi bi-people-fill me-2 menu-text"></i> Clientes</a>
-                </li>
-                <li>
-                    <a href="#"><i class="bi bi-truck me-2 menu-text"></i> Veículos</a>
-                </li>
-                <li>
-                    <a href="#"><i class="bi bi-tools me-2 menu-text"></i> Serviços</a>
+            <ul class="list-unstyled components px-2 m-0">
+                <li class="text-muted px-2 small fw-bold text-uppercase mb-2 menu-text">Painel Principal</li>
+                <li class="mb-1">
+                    <a asp-controller="Home" asp-action="Index" class="d-flex align-items-center text-decoration-none text-light py-2 px-2 rounded">
+                        <i class="bi bi-speedometer2 fs-5 flex-shrink-0"></i>
+                        <span class="menu-text ms-2 text-nowrap">Dashboard</span>
+                    </a>
                 </li>
 
-                <li class="text-muted px-3 small fw-bold text-uppercase mt-4 mb-2 menu-text">Sistema</li>
-                <li>
-                    <a asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-lock me-2 menu-text"></i> Privacidade</a>
+                <li class="text-muted px-2 small fw-bold text-uppercase mt-4 mb-2 menu-text">Cadastros</li>
+                <li class="mb-1">
+                    <a asp-controller="Cliente" asp-action="Index" class="d-flex align-items-center text-decoration-none text-light py-2 px-2 rounded">
+                        <i class="bi bi-people-fill fs-5 flex-shrink-0"></i>
+                        <span class="menu-text ms-2 text-nowrap">Clientes</span>
+                    </a>
+                </li>
+                <li class="mb-1">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-light py-2 px-2 rounded">
+                        <i class="bi bi-truck fs-5 flex-shrink-0"></i>
+                        <span class="menu-text ms-2 text-nowrap">Veículos</span>
+                    </a>
+                </li>
+                <li class="mb-1">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-light py-2 px-2 rounded">
+                        <i class="bi bi-tools fs-5 flex-shrink-0"></i>
+                        <span class="menu-text ms-2 text-nowrap">Serviços</span>
+                    </a>
+                </li>
+
+                <li class="text-muted px-2 small fw-bold text-uppercase mt-4 mb-2 menu-text">Sistema</li>
+                <li class="mb-1">
+                    <a asp-controller="Home" asp-action="Privacy" class="d-flex align-items-center text-decoration-none text-light py-2 px-2 rounded">
+                        <i class="bi bi-shield-lock fs-5 flex-shrink-0"></i>
+                        <span class="menu-text ms-2 text-nowrap">Privacidade</span>
+                    </a>
                 </li>
             </ul>
         </nav>
-
         <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
         <div id="content">
             <!-- Navbar Superior -->
