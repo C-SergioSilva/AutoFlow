@@ -317,7 +317,8 @@ function executarPesquisaCombinada() {
             // Se o documento estiver preenchido mas falhou na matemática oficial:
             if (!documentoEhValido) {
                 documento.classList.add("is-invalid");
-                formValido = false;
+                mostrarAlerta("Número de documento Inválido, Por favor, verifique e entre com o número correto!", "erro");
+                return;
             } else {
                 documento.classList.remove("is-invalid");
             }
