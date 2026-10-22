@@ -1,5 +1,7 @@
 ﻿using AutoFlow.Domain.Entidades;
+using AutoFlow.Domain.Enum;
 using AutoFlow.Domain.Interfacees;
+using AutoFlow.Domain.Utils;
 using AutoFlow.Infrastructure.Repositorios;
 using AutoFlow.Service.Interface;
 using AutoFlow.Service.ViewsModel;
@@ -21,17 +23,44 @@ namespace AutoFlow.Service.Services
         {
             try
             {
-                // Se o documento veio preenchido, removemos tudo o que não for letra ou número 
-                // (Isso garante que pontos, traços, barras e espaços voem pelo ar e fique só o valor puro!)
+                // 1. Limpa o documento para garantir que temos apenas números puros
                 clienteVM.Documento = repositorio.Limpardocumento(clienteVM.Documento);
-                
-                var clienteEntidade = map.Map<Domain.Entidades.Cliente>(clienteVM);
+
+                // 🌟 2. AQUI ENTRA A NOSSA VALIDAÇÃO MATEMÁTICA!
+                // Verificamos se o documento foi preenchido e validamos de acordo com o tipo de cliente (CPF ou CNPJ)
+                if (!string.IsNullOrEmpty(clienteVM.Documento))
+                {
+                    // Supondo que você tenha uma propriedade indicando se é Pessoa Física (ex: Tipo == 1) ou Jurídica (ex: Tipo == 2)
+                    // Ajuste o nome da propriedade 'Tipo' ou 'TipoPessoa' conforme o seu modelo real.
+
+                    bool documentoEhValido = false;
+
+                    if (clienteVM.Tipo == TipoCliente.Cpf) // Exemplo: 1 para CPF (Pessoa Física)
+                    {
+                        documentoEhValido = ValidadorDocumentoCPFCNPJ.ValidarCPF(clienteVM.Documento);
+                        if (!documentoEhValido)
+                        {
+                            throw new InvalidOperationException("O CPF informado é inválido!");
+                        }
+                    }
+                    else if (clienteVM.Tipo == TipoCliente.Cnpj) // Exemplo: 2 para CNPJ (Pessoa Jurídica)
+                    {
+                        documentoEhValido = ValidadorDocumentoCPFCNPJ.ValidarCNPJ(clienteVM.Documento);
+                        if (!documentoEhValido)
+                        {
+                            throw new InvalidOperationException("O CNPJ informado é inválido!");
+                        }
+                    }
+                }
+
+                // 3. Se passou pela validação, prossegue com o mapeamento e salvamento normal
+                var clienteEntidade = map.Map<Cliente>(clienteVM);
                 var clienteAdicionado = await repositorio.AdicionarESalvar(clienteEntidade);
                 return map.Map<ClienteVM>(clienteAdicionado);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                throw new InvalidOperationException(ex.Message);
             }
         }
 

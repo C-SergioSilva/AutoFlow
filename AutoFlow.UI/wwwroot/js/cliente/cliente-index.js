@@ -2,6 +2,7 @@
 import { formatarDocumento, formatarTelefone, mascararDocumentoParcial } from '/js/utils/masks.js';
 import { mostrarAlerta } from '/js/utils/toast.js';
 import { renderizarPaginacao } from '/js/utils/paginacao.js';
+import { validarCPF, validarCNPJ } from '../utils/validadores.js';
 
 // ====================================================
 // FUNÇÃO DE CARREGAR CLIENTES (GET)
@@ -297,12 +298,29 @@ function executarPesquisaCombinada() {
             tipoCliente.classList.remove("is-invalid");
         }
 
-        // Valida Documento
+        // Valida Documento (Preenchimento e Validação Matemática)
         if (!documento.value.trim()) {
             documento.classList.add("is-invalid");
             formValido = false;
         } else {
-            documento.classList.remove("is-invalid");
+            // 🌟 AQUI ENTRA A NOSSA MAGIA DE VALIDAÇÃO MATEMÁTICA!
+            // Descobrimos se o tipo é CPF (ex: 1) ou CNPJ (ex: 2) e validamos de acordo
+            let documentoEhValido = true;
+            const tipoValor = parseInt(tipoCliente.value);
+
+            if (tipoValor === 1) { // 1 = Pessoa Física (CPF)
+                documentoEhValido = validarCPF(documento.value);
+            } else if (tipoValor === 2) { // 2 = Pessoa Jurídica (CNPJ)
+                documentoEhValido = validarCNPJ(documento.value);
+            }
+
+            // Se o documento estiver preenchido mas falhou na matemática oficial:
+            if (!documentoEhValido) {
+                documento.classList.add("is-invalid");
+                formValido = false;
+            } else {
+                documento.classList.remove("is-invalid");
+            }
         }
 
         // Se algum campo falhou na validação, paramos por aqui e avisamos

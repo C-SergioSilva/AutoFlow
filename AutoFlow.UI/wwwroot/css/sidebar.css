@@ -10,14 +10,20 @@ body {
     align-items: stretch;
 }
 
-#sidebar ul li a {
-    padding: 12px 20px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    display: block;
-    color: #cfd8dc;
-    text-decoration: none;
-    transition: 0.2s;
+/* ==========================================================================
+   AJUSTE DE HOVER PARA MODO RECOLHIDO (SEM BORDA + EFEITO SCALE NO ÍCONE)
+   ========================================================================== */
+
+/* 2. Sobrescreve e remove a borda azul da esquerda quando a barra estiver recolhida */
+body.menu-recolhido #sidebar ul li a:hover {
+    border-left: none !important;
+    background: transparent !important; /* Remove o bloco azul escuro de fundo atrás do ícone */
+}
+
+/* 3. Aplica a sensação suave de aumento do ícone (Scale 1.2) ao passar o mouse no modo recolhido */
+body.menu-recolhido #sidebar ul li a:hover i {
+    transform: scale(1.2) !important; /* Aumenta o tamanho do ícone em 20% suavemente */
+    color: #6ee4e9 !important; /* Opcional: altera para um tom ciano/azul claro vibrante para destacar */
 }
 
 #sidebar ul li a:hover {
@@ -97,6 +103,11 @@ body.menu-recolhido #sidebar a i {
     font-size: 1.4rem !important;
 }
 
+.px-4-menu-recolhido {
+    padding-right: 2.5rem !important;
+    padding-left: 1.5rem !important;
+}
+
 /* O Cabeçalho da Sidebar (Logo e Botão) no modo recolhido */
 body.menu-recolhido #sidebar .sidebar-header span {
     display: none !important;
@@ -108,7 +119,7 @@ body.menu-recolhido #sidebar .sidebar-header {
 }
 
 /* 🌟 A MÁGICA DO HOVER: Quando o mouse passa por cima da barra recolhida, ela expande suavemente! */
-body.menu-recolhido #sidebar:hover {
+/*body.menu-recolhido #sidebar:hover {
     min-width: 260px !important;
     max-width: 260px !important;
 }
@@ -134,7 +145,7 @@ padding: 15px !important;
 
 body.menu-recolhido #sidebar:hover .sidebar-header span {
     display: inline !important;
-}
+}*/
 
 /* Remove qualquer foco feio ou persistente do botão do menu ao clicar */
 #btnToggleMenu:focus,
@@ -144,17 +155,15 @@ body.menu-recolhido #sidebar:hover .sidebar-header span {
 }
 
 /* Enquanto a trava de clique estiver ativa, o hover não expande a barra */
-body.menu-recolhido #sidebar.travar-hover {
+/*body.menu-recolhido #sidebar.travar-hover {
     min-width: 70px !important;
     max-width: 70px !important;
-}
+}*/
 
 /* Garante que os textos continuem sumidos durante a trava */
-body.menu-recolhido #sidebar.travar-hover .menu-text,
+/*body.menu-recolhido #sidebar.travar-hover .menu-text,
 body.menu-recolhido #sidebar.travar-hover li.text-muted {
     display: none !important;
-}
-
-
+}*/
 
 /**************************************************************/
