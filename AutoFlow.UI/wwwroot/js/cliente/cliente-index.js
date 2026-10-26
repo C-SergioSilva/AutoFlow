@@ -269,6 +269,7 @@ function executarPesquisaCombinada() {
         const telefone = document.getElementById("telefone");
         const documento = document.getElementById("documento");
         const tipoCliente = document.getElementById("tipoCliente");
+        let documentoLimpo = document.getElementById("documentoOriginal"); // Limpa o documento para enviar apenas números
 
         let formValido = true;
 
@@ -303,24 +304,30 @@ function executarPesquisaCombinada() {
             documento.classList.add("is-invalid");
             formValido = false;
         } else {
-            // 🌟 AQUI ENTRA A NOSSA MAGIA DE VALIDAÇÃO MATEMÁTICA!
-            // Descobrimos se o tipo é CPF (ex: 1) ou CNPJ (ex: 2) e validamos de acordo
-            let documentoEhValido = true;
-            const tipoValor = parseInt(tipoCliente.value);
-
-            if (tipoValor === 1) { // 1 = Pessoa Física (CPF)
-                documentoEhValido = validarCPF(documento.value);
-            } else if (tipoValor === 2) { // 2 = Pessoa Jurídica (CNPJ)
-                documentoEhValido = validarCNPJ(documento.value);
-            }
-
-            // Se o documento estiver preenchido mas falhou na matemática oficial:
-            if (!documentoEhValido) {
-                documento.classList.add("is-invalid");
-                mostrarAlerta("Número de documento Inválido, Por favor, verifique e entre com o número correto!", "erro");
-                return;
-            } else {
+            // Se o documento contém asteriscos '*', significa que veio mascarado da listagem (Modo Edição)
+            // Logo, não precisamos de revalidar a matemática dele na ponta do client-side, 
+            // pois ele já está guardado de forma segura no banco de dados!
+            if (documento.value.includes('*')) {
                 documento.classList.remove("is-invalid");
+            } else {
+                // É um documento novo digitado pelo usuário do zero! Aplicamos a validação matemática:
+                documentoLimpo = documento.value.replace(/\D/g, '');
+                let documentoEhValido = true;
+                const tipoValor = parseInt(tipoCliente.value);
+
+                if (tipoValor === 1) {
+                    documentoEhValido = validarCPF(documentoLimpo);
+                } else if (tipoValor === 2) {
+                    documentoEhValido = validarCNPJ(documentoLimpo);
+                }
+
+                if (!documentoEhValido) {
+                    documento.classList.add("is-invalid");
+                    mostrarAlerta("Número de documento Inválido! Verifique e entre com o número correto.", "erro");
+                    return;
+                } else {
+                    documento.classList.remove("is-invalid");
+                }
             }
         }
 
@@ -334,7 +341,7 @@ function executarPesquisaCombinada() {
             Id: id.value ? parseInt(id.value) : 0,
             Nome: nome.value,
             TelefoneWhatsApp: telefone.value,
-            Documento: documento.value,
+            Documento: id.value ? documentoLimpo.value : documento.value.replace(/\D/g, ''), // Se for edição, pega o valor limpo do input oculto; se for novo, limpa o input digitado
             Tipo: parseInt(tipoCliente.value)
         };
 
@@ -384,7 +391,15 @@ function executarPesquisaCombinada() {
 
         // Verifica se o elemento clicado (ou o ícone dentro dele) é o botão de editar
         const btnEditar = event.target.closest(".btn-editar");
-        if (!btnEditar) return;
+        const idCliente = document.getElementById("clienteId").value;
+        if (!btnEditar && (!idCliente || idCliente === '' || idCliente === '0')) {
+            // 🌟 Deixamos o Documento e o Tipo habilitados para o caso de ser um novo cadastro
+            document.getElementById("documento").disabled = false;
+            document.getElementById("tipoCliente").disabled = false;
+        }
+        if (!btnEditar) {
+            return;
+        }
 
         // Pega os dados guardados nos atributos data-* do botão
         const id = btnEditar.getAttribute("data-id");
@@ -404,10 +419,15 @@ function executarPesquisaCombinada() {
 
         // Joga os valores dentro dos inputs do modal
         document.getElementById("clienteId").value = id;
+        document.getElementById("documentoOriginal").value = documento; // Guardamos o valor original do documento para referência futura
         document.getElementById("nome").value = nome;
         document.getElementById("telefone").value = formatarTelefone(telefone);
-        document.getElementById("documento").value = formatarDocumento(documento, tipoValor);
+        document.getElementById("documento").value = mascararDocumentoParcial(documento, tipoValor);
         document.getElementById("tipoCliente").value = tipoValor;
+
+        // 🌟 O PULO DO GATO PARA A EDIÇÃO: Deixamos o Documento e o Tipo em modo de leitura (desabilitados)
+        document.getElementById("documento").disabled = true;
+        document.getElementById("tipoCliente").disabled = true;
 
         // Altera o título do modal opcionalmente para dar feedback ao usuário
         const modalTitle = document.getElementById("modalClienteLabel");
