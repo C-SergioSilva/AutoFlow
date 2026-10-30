@@ -31,42 +31,35 @@ export function validarCPF(cpf) {
     return true;
 }
 
-// Função para validar CNPJ no Front-end
+
 export function validarCNPJ(cnpj) {
-    // 1. Remove tudo o que não for dígito
-    cnpj = cnpj.replace(/\D/g, '');
+    if (!cnpj) return false;
 
-    // 2. Verifica se tem 14 dígitos ou se todos são iguais
-    if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) {
-        return false;
-    }
+    // 1. Remove máscara mantendo letras e números; normaliza para maiúsculo
+    cnpj = cnpj.replace(/[^0-9A-Za-z]/g, '').toUpperCase();
 
-    let tamanho = cnpj.length - 2;
-    let numeros = cnpj.substring(0, tamanho);
-    let digitos = cnpj.substring(tamanho);
-    let soma = 0;
-    let pos = tamanho - 7;
+    // 2. 12 alfanuméricos + 2 dígitos verificadores numéricos
+    if (!/^[0-9A-Z]{12}\d{2}$/.test(cnpj)) return false;
 
-    for (let i = tamanho; i >= 1; i--) {
-        soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2) pos = 9;
-    }
+    // 3. Todos os caracteres iguais
+    if (/^(.)\1+$/.test(cnpj)) return false;
 
-    let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
-    if (resultado !== parseInt(digitos.charAt(0))) return false;
+    const calcularDV = (base) => {
+        const pesos = base.length === 12
+            ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+            : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-    tamanho = tamanho + 1;
-    numeros = cnpj.substring(0, tamanho);
-    soma = 0;
-    pos = tamanho - 7;
+        let soma = 0;
+        for (let i = 0; i < base.length; i++) {
+            soma += (base.charCodeAt(i) - 48) * pesos[i]; // ASCII - 48
+        }
+        const resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    };
 
-    for (let i = tamanho; i >= 1; i--) {
-        soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2) pos = 9;
-    }
+    const base = cnpj.substring(0, 12);
+    const dv1 = calcularDV(base);
+    const dv2 = calcularDV(base + dv1);
 
-    resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
-    if (resultado !== parseInt(digitos.charAt(1))) return false;
-
-    return true;
+    return cnpj.endsWith(`${dv1}${dv2}`);
 }

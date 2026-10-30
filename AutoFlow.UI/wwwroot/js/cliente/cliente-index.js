@@ -318,12 +318,12 @@ function executarPesquisaCombinada() {
                 if (tipoValor === 1) {
                     documentoEhValido = validarCPF(documentoLimpo);
                 } else if (tipoValor === 2) {
-                    documentoEhValido = validarCNPJ(documentoLimpo);
+                    documentoEhValido = validarCNPJ(documento.value);
                 }
 
                 if (!documentoEhValido) {
                     documento.classList.add("is-invalid");
-                    mostrarAlerta("Número de documento Inválido! Verifique e entre com o número correto.", "erro");
+                    mostrarAlerta("Número de documento Inválido! Verifique e entre com o número que seja válido.", "erro");
                     return;
                 } else {
                     documento.classList.remove("is-invalid");
@@ -341,7 +341,7 @@ function executarPesquisaCombinada() {
             Id: id.value ? parseInt(id.value) : 0,
             Nome: nome.value,
             TelefoneWhatsApp: telefone.value,
-            Documento: id.value ? documentoLimpo.value : documento.value.replace(/\D/g, ''), // Se for edição, pega o valor limpo do input oculto; se for novo, limpa o input digitado
+            Documento: id.value ? documentoLimpo.value : documento.value.replace(/[^0-9A-Za-z]/g, ''), // Se for edição, pega o valor limpo do input oculto; se for novo, limpa o input digitado
             Tipo: parseInt(tipoCliente.value)
         };
 
