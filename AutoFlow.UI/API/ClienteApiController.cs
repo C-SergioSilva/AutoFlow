@@ -1,5 +1,4 @@
 ﻿using AutoFlow.Service.Interface;
-using AutoFlow.Service.Services;
 using AutoFlow.Service.ViewsModel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +30,7 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
 
     }
 
-    [HttpGet("paginados")] // Rota que nossa tela vai chamar: /api/cliente/paginados?pagina=1&quantidade=10
+    [HttpGet("paginados")] // Rota que a tela vai chamar: /api/cliente/paginados?pagina=1&quantidade=10
     public async Task<IActionResult> ObterClientesPaginados([FromQuery] int pagina = 1,[FromQuery] int quantidade = 10,[FromQuery] string nome = null,
     [FromQuery] int? tipoDocumento = null, [FromQuery] string documento = null)
     {
