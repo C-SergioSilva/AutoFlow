@@ -2,7 +2,6 @@
 using AutoFlow.Domain.Enum;
 using AutoFlow.Domain.Interfacees;
 using AutoFlow.Domain.Utils;
-using AutoFlow.Infrastructure.Repositorios;
 using AutoFlow.Service.Interface;
 using AutoFlow.Service.ViewsModel;
 using AutoMapper;
@@ -24,7 +23,7 @@ namespace AutoFlow.Service.Services
             try
             {
                 // 1. Limpa o documento para garantir que temos apenas números puros
-                clienteVM.Documento = repositorio.Limpardocumento(clienteVM.Documento);
+                clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
 
                 // 🌟 2. AQUI ENTRA A NOSSA VALIDAÇÃO MATEMÁTICA!
                 // Verificamos se o documento foi preenchido e validamos de acordo com o tipo de cliente (CPF ou CNPJ)
@@ -69,7 +68,7 @@ namespace AutoFlow.Service.Services
             try
             {
                 // 1. Limpa o documento para garantir que temos apenas números puros
-                clienteVM.Documento = repositorio.Limpardocumento(clienteVM.Documento);
+                clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
 
                 // 🌟 2. AQUI ENTRA A VALIDAÇÃO MATEMÁTICA!
                 // Verifica se o documento foi preenchido e valida de acordo com o tipo de cliente (CPF ou CNPJ)
@@ -98,10 +97,14 @@ namespace AutoFlow.Service.Services
                     }
                 }
 
-                clienteVM.Documento = repositorio.Limpardocumento(clienteVM.Documento);
-                var clienteEntidade = map.Map<Cliente>(clienteVM);
-                var clienteAtualizado = await repositorio.Atualizar(clienteEntidade);
-                return map.Map<ClienteVM>(clienteAtualizado);
+                var clienteEntidade = await repositorio.ObterPorId(clienteVM.Id)
+                    ?? throw new InvalidOperationException("Cliente não encontrado.");
+                
+                map.Map(clienteVM, clienteEntidade);
+                await repositorio.Commit();
+
+                clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
+                return map.Map<ClienteVM>(clienteEntidade);
             }
             catch (Exception ex)
             {
@@ -148,23 +151,11 @@ namespace AutoFlow.Service.Services
             }
         }
 
-        public async Task<IEnumerable<VeiculoVM>> ObterVeiculos()
-        {
-            try
-            {
-                var veiculosEntidade = await repositorio.ObterTodos();
-                return map.Map<IEnumerable<VeiculoVM>>(veiculosEntidade);   
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-        }
-
         public async Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento)
         {
             try
             {
+                documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(documento);
                 // 1. Chama o repositório que busca os dados paginados lá no banco
                 var resultadoRepositorio = await repositorio.ObterClientesPaginadosAsync(pagina, quantidade, nome, tipoDocumento, documento);
 
@@ -186,11 +177,11 @@ namespace AutoFlow.Service.Services
             }
         }   
 
-        public async Task StatusDeletado(int Id)
+        public async Task MarcarStatusDeletadoClienteVeiculos(int Id)
         {
             try
             {
-                await repositorio.MarcarComoDeletadoPorId(Id);
+                await repositorio.MarcarComoDeletadoClienteEVeiculo(Id); 
             }
             catch (Exception ex)
             {

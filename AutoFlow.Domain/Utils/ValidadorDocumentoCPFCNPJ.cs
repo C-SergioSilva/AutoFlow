@@ -8,8 +8,6 @@ namespace AutoFlow.Domain.Utils
     {
         public static bool ValidarCPF(string cpf)
         {
-            cpf = "77243765300";
-
             if (string.IsNullOrWhiteSpace(cpf)) return false;
 
             // 1. Remove caracteres não numéricos
@@ -69,6 +67,18 @@ namespace AutoFlow.Domain.Utils
             int digito2 = resto < 2 ? 0 : 11 - resto;
 
             return cnpj.EndsWith($"{digito1}{digito2}");
+        }
+
+        public static string Limpardocumento(string documento)
+        {
+            // Se o documento veio preenchido, removemos tudo o que não for letra ou número 
+            // (Isso garante que pontos, traços, barras e espaços voem pelo ar e fique só o valor puro!)
+            if (!string.IsNullOrEmpty(documento))
+            {
+                documento = new string(documento.Where(char.IsLetterOrDigit).ToArray());
+            }
+
+            return documento;
         }
     }
 }

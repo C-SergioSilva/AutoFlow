@@ -168,89 +168,102 @@ function executarPesquisaCombinada() {
 //`/api/clienteapi/paginados?pagina=${estadoPaginacao.paginaAtual}&quantidade=${estadoPaginacao.quantidadePorPagina}`
 // ========================================================================
 
-    async function carregarClientes() {
-            try {
+async function carregarClientes() {
+    try{
 
-                const url = `/api/clienteapi/paginados?pagina=${estadoPaginacao.paginaAtual}&quantidade=${estadoPaginacao.quantidadePorPagina}` +
-                    `&nome=${encodeURIComponent(estadoPaginacao.filtroNome)}&tipoDocumento=${estadoPaginacao.filtroTipoDocumento}` +
-                    `&documento=${encodeURIComponent(estadoPaginacao.filtroValorDocumento)}`;
+        const url = `/api/clienteapi/paginados?pagina=${estadoPaginacao.paginaAtual}&quantidade=${estadoPaginacao.quantidadePorPagina}` +
+            `&nome=${encodeURIComponent(estadoPaginacao.filtroNome)}&tipoDocumento=${estadoPaginacao.filtroTipoDocumento}` +
+            `&documento=${encodeURIComponent(estadoPaginacao.filtroValorDocumento)}`;
 
-                const resposta = await fetch(url);
+        const resposta = await fetch(url);
        
-                if (!resposta.ok) {
-                    throw new Error("Erro ao buscar os dados da API.");
-                }
-
-                const resultadoPaginado = await resposta.json();
-                const clientes = resultadoPaginado.items;
-                const container = document.getElementById("container-clientes");
-                container.innerHTML = "";
-
-                // Validação se a lista estiver vazia
-                if (!clientes || clientes.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-12 text-center py-5">
-                            <div class="text-muted">
-                                <i class="bi bi-folder2-open display-4 mb-3 d-block"></i>
-                                <h5>Nenhum cliente cadastrado ainda.</h5>
-                                <p class="small">Clique no botão "Novo Cliente" acima para começar a cadastrar.</p>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Renderiza os tickets na tela
-                clientes.forEach(cliente => {
-                    console.log("Cliente recebido da API:", cliente);
-                    const cardDiv = document.createElement("div");
-                    cardDiv.className = "col-md-4 col-sm-6";
-
-                    cardDiv.innerHTML = `
-                        <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title fw-bold color-text-padrao mb-0">${cliente.nome}</h5>
-                                    <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
-                                </div>
-                                <p class="card-text text-muted small mb-2">
-                                    <i class="bi bi-whatsapp text-success me-1"></i> ${formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado'}
-                                </p>
-                                <p class="card-text text-muted small mb-3">
-                                   <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}
-                                </p>
-                                <div class="d-flex justify-content-end gap-2 pt-2 border-top">
-                             
-                                <button class="btn btn-sm btn-salvar-modal-padrao btn-editar"
-                                        title="Editar"
-                                        data-id="${cliente.id}"
-                                        data-nome="${cliente.nome}"
-                                        data-telefone="${cliente.telefoneWhatsApp}"
-                                        data-documento="${cliente.documento}"
-                                        data-tipo="${cliente.tipo}">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                    <button class="btn btn-sm btn-outline-danger btn-excluir" 
-                                        title="Excluir"
-                                        data-id="${cliente.id}">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    container.appendChild(cardDiv);
-                });
-
-                // 🌟 RENDERIZA A PAGUNAÇÃO AQUI:
-                // Passamos os dados que vieram da API, a própria função carregarClientes e o estado atual!
-                renderizarPaginacao(resultadoPaginado, carregarClientes, estadoPaginacao, "paginacao-container01", "paginacao-container02");
-
-            } catch (error) {
-                console.error("Erro detalhado:", error);
-            }
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar os dados da API.");
         }
+
+        const resultadoPaginado = await resposta.json();
+        const clientes = resultadoPaginado.items;
+        const container = document.getElementById("container-clientes");
+        container.innerHTML = "";
+
+        // Validação se a lista estiver vazia
+        if (!clientes || clientes.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="text-muted">
+                        <i class="bi bi-folder2-open display-4 mb-3 d-block"></i>
+                        <h5>Nenhum registo foi encontrado.</h5>
+                        <p class="small">Clique no botão "Novo Cliente" acima para começar a cadastrar.</p>
+                    </div>
+                </div>
+            `;
+            // return;
+        } else {
+
+
+            // Renderiza os tickets na tela
+            clientes.forEach(cliente => {
+                console.log("Cliente recebido da API:", cliente);
+                const cardDiv = document.createElement("div");
+                cardDiv.className = "col-md-4 col-sm-6";
+
+                cardDiv.innerHTML = `
+                <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold color-text-padrao mb-0">${cliente.nome}</h5>
+                            <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
+                        </div>
+                        <p class="card-text text-muted small mb-2">
+                            <i class="bi bi-whatsapp text-success me-1"></i> ${formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado'}
+                        </p>
+                        <p class="card-text text-muted small mb-3">
+                            <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}
+                        </p>
+                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                             
+                        <button class="btn btn-sm btn-salvar-modal-padrao btn-editar"
+                                title="Editar"
+                                data-id="${cliente.id}"
+                                data-nome="${cliente.nome}"
+                                data-telefone="${cliente.telefoneWhatsApp}"
+                                data-documento="${cliente.documento}"
+                                data-tipo="${cliente.tipo}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                            <button class="btn btn-sm btn-outline-danger btn-excluir" 
+                                title="Excluir"
+                                data-id="${cliente.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                container.appendChild(cardDiv);
+            });
+
+        }
+
+        // 🌟 RENDERIZA A PAGUNAÇÃO AQUI:
+        // Passamos os dados que vieram da API, a própria função carregarClientes e o estado atual!
+        renderizarPaginacao(resultadoPaginado, carregarClientes, estadoPaginacao, "paginacao-container01", "paginacao-container02");
+
+    } catch (error) {
+        console.error("Erro detalhado:", error);
+        const container = document.getElementById("container-clientes");
+        container.innerHTML = `
+        <div class="col-12 text-center py-5">
+            <div class="text-danger">
+                <i class="bi bi-exclamation-triangle display-4 mb-3 d-block"></i>
+                <h5>Ocorreu um erro ao carregar os clientes.</h5>
+                <p class="small text-muted">Por favor, verifique sua conexão ou tente novamente mais tarde.</p>
+            </div>
+        </div>
+    `;
+    }
+}
 
 // ====================================================
 //                  FIM DA FUNÇÃO

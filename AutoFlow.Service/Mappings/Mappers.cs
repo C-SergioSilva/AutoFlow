@@ -10,6 +10,12 @@ namespace AutoFlow.Service.Mappings
         {
             CreateMap<Cliente, ClienteVM>().ReverseMap();
             CreateMap<Veiculo, VeiculoVM>().ReverseMap();
+
+            CreateMap<ClienteVM, Cliente>()
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.Deleted, o => o.Ignore())
+                .ForMember(d => d.Veiculos, o => o.Ignore());
+            
         }
     }
 }

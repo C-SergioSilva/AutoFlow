@@ -59,27 +59,33 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
     {
         try
         {
-            var resultado = new ClienteVM();
-
             if (cliente == null)
             {
-                return BadRequest("Cliente inválido.");
+                return BadRequest("Cliente inválido ou não encontrado.");
             }
+
+            var resultado = new ClienteVM();
 
             if (cliente.Id > 0)
             {
-                 resultado = await clienteService.AtualizarCliente(cliente);
+                resultado = await clienteService.AtualizarCliente(cliente);
+
+                // Blindagem contra ID inexistente (Evita o erro 500 / NullReferenceException)
+                if (resultado == null)
+                {
+                    return NotFound("Cliente não encontrado para atualização.");
+                }
+
                 return CreatedAtAction(nameof(ObterTodos), new { id = resultado.Id }, resultado);
             }
 
-             resultado = await clienteService.AdicionarSalvar(cliente);
+            resultado = await clienteService.AdicionarSalvar(cliente);
             return CreatedAtAction(nameof(ObterTodos), new { id = resultado.Id }, resultado);
         }
         catch (Exception ex)
         {
-
-            throw new Exception(ex.Message,  ex);
-        }      
+            throw new Exception(ex.Message, ex);
+        }
     }
 
     [HttpDelete("{id}")]
@@ -88,7 +94,7 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
         try
         {
             // Chamamos diretamente o serviço passando o ID que veio na URL
-            await clienteService.StatusDeletado(id);
+            await clienteService.MarcarStatusDeletadoClienteVeiculos(id);
 
             // Retornamos um status 204 (NoContent) indicando que deu tudo certo e foi excluído
             return NoContent();

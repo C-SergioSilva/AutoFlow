@@ -109,6 +109,8 @@ namespace AutoFlow.Infrastructure.Repositorios
         {
             try
             {
+                item.Deleted = true;
+                context.Update(item);
                 await context.SaveChangesAsync();
             }
             catch (Exception)
