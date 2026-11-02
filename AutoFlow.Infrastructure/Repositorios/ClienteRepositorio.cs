@@ -3,14 +3,12 @@ using AutoFlow.Domain.Enum;
 using AutoFlow.Domain.Interfacees;
 using AutoFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace AutoFlow.Infrastructure.Repositorios
 {
     public class ClienteRepositorio : BaseRepositorio<Cliente>, IClienteRepositorio
     {
         public ClienteRepositorio(AppDbContext context) : base(context){}
-
         public async Task<IEnumerable<Cliente>> ObterTodosClientesEVeiculos()
         {
             return await Queryable()
