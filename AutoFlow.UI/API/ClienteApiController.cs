@@ -96,7 +96,7 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
             // Chamamos diretamente o serviço passando o ID que veio na URL
             await clienteService.MarcarStatusDeletadoClienteVeiculos(id);
 
-            // Retornamos um status 204 (NoContent) indicando que deu tudo certo e foi excluído
+            // Retorna um status 204 (NoContent) indicando que deu tudo certo e foi excluído
             return NoContent();
         }
         catch (Exception ex)
