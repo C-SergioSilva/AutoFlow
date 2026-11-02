@@ -46,7 +46,6 @@ namespace AutoFlow.Infrastructure.Repositorios
                 TotalRecords = totalRegistros
             };
         }
-
         public async Task MarcarComoDeletadoClienteEVeiculo(int clienteId) 
         {
             // Usamos o DbSet genérico ou fazemos cast do contexto para AppDbContext
