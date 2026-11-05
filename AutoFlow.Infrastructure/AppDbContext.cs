@@ -23,5 +23,35 @@ namespace AutoFlow.Infrastructure.Data
             // Aplica automaticamente todas as classes de mapeamento que herdam de IEntityTypeConfiguration neste assembly
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            RegistrarDatas();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            RegistrarDatas();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void RegistrarDatas()
+        {
+            var agora = DateTime.UtcNow;
+
+            foreach (var entrada in ChangeTracker.Entries<BaseEntity>())
+            {
+                if (entrada.State == EntityState.Added)
+                {
+                    entrada.Entity.CreatedAt = agora;
+                }
+                else if (entrada.State == EntityState.Modified)
+                {
+                    entrada.Property(e => e.CreatedAt).IsModified = false;
+                    entrada.Entity.UpdatedAt = agora;
+                }
+            }
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using AutoFlow.Domain.Entidades;
-using Microsoft.EntityFrameworkCore;
-using System.Buffers.Text;
 
 namespace AutoFlow.Domain.Interfacees
 {
@@ -16,6 +14,5 @@ namespace AutoFlow.Domain.Interfacees
         Task MarcarComoDeletado(T item);
         Task Commit();
         Task MarcarComoDeletadoPorId(int Id);
-        DbContext GetContext();
     }
 }

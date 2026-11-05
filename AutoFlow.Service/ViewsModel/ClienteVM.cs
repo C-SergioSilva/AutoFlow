@@ -5,7 +5,8 @@ namespace AutoFlow.Service.ViewsModel
     public class ClienteVM
     {
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }      // null = nunca foi alterado
         public string Nome { get; set; } = string.Empty;
         public string TelefoneWhatsApp { get; set; } = string.Empty;
         public TipoCliente Tipo { get; set; } // PF ou PJ

@@ -5,7 +5,8 @@ namespace AutoFlow.Service.ViewsModel
     public class VeiculoVM
     {
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }      // null = nunca foi alterado
 
         public string Placa { get; set; } = string.Empty;
         public string Modelo { get; set; } = string.Empty;

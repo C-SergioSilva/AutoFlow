@@ -22,7 +22,7 @@ namespace AutoFlow.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AutoFlow.Domain.Entities.Cliente", b =>
+            modelBuilder.Entity("AutoFlow.Domain.Entidades.Cliente", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,12 +54,15 @@ namespace AutoFlow.Infrastructure.Migrations
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.ToTable("Clientes", (string)null);
                 });
 
-            modelBuilder.Entity("AutoFlow.Domain.Entities.Veiculo", b =>
+            modelBuilder.Entity("AutoFlow.Domain.Entidades.Veiculo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,6 +92,9 @@ namespace AutoFlow.Infrastructure.Migrations
                     b.Property<int>("Quilometragem")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
@@ -96,9 +102,9 @@ namespace AutoFlow.Infrastructure.Migrations
                     b.ToTable("Veiculos", (string)null);
                 });
 
-            modelBuilder.Entity("AutoFlow.Domain.Entities.Veiculo", b =>
+            modelBuilder.Entity("AutoFlow.Domain.Entidades.Veiculo", b =>
                 {
-                    b.HasOne("AutoFlow.Domain.Entities.Cliente", "Cliente")
+                    b.HasOne("AutoFlow.Domain.Entidades.Cliente", "Cliente")
                         .WithMany("Veiculos")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -107,7 +113,7 @@ namespace AutoFlow.Infrastructure.Migrations
                     b.Navigation("Cliente");
                 });
 
-            modelBuilder.Entity("AutoFlow.Domain.Entities.Cliente", b =>
+            modelBuilder.Entity("AutoFlow.Domain.Entidades.Cliente", b =>
                 {
                     b.Navigation("Veiculos");
                 });

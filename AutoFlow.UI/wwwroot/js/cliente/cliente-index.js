@@ -3,6 +3,7 @@ import { formatarDocumento, formatarTelefone, mascararDocumentoParcial } from '/
 import { mostrarAlerta } from '/js/utils/toast.js';
 import { renderizarPaginacao } from '/js/utils/paginacao.js';
 import { validarCPF, validarCNPJ } from '../utils/validadores.js';
+import { escaparHtml } from '/js/utils/seguranca.js';
 
 // ====================================================
 // FUNÇÃO DE CARREGAR CLIENTES (GET)
@@ -211,32 +212,32 @@ async function carregarClientes() {
                 <div class="card border-0 shadow-sm h-100 border-start border-padrao-cards border-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-bold color-text-padrao mb-0">${cliente.nome}</h5>
-                            <span class="badge bg-light text-secondary d-none">#${cliente.id || '0'}</span>
+                            <h5 class="card-title fw-bold color-text-padrao mb-0">${escaparHtml(cliente.nome)}</h5>
+                            <span class="badge bg-light text-secondary d-none">#${escaparHtml(cliente.id || '0')}</span>
                         </div>
                         <p class="card-text text-muted small mb-2">
-                            <i class="bi bi-whatsapp text-success me-1"></i> ${formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado'}
+                            <i class="bi bi-whatsapp text-success me-1"></i> ${escaparHtml(formatarTelefone(cliente.telefoneWhatsApp) || 'Não informado')}
                         </p>
                         <p class="card-text text-muted small mb-3">
-                            <i class="bi bi-card-text text-secondary me-1"></i> ${cliente.tipo} : ${mascararDocumentoParcial(cliente.documento) || 'Não informado'}
+                            <i class="bi bi-card-text text-secondary me-1"></i> ${escaparHtml(cliente.tipo)} : ${escaparHtml(mascararDocumentoParcial(cliente.documento) || 'Não informado')}
                         </p>
                         <div class="d-flex justify-content-end gap-2 pt-2 border-top">
                              
                         <button class="btn btn-sm btn-salvar-modal-padrao btn-editar"
                                 title="Editar"
-                                data-id="${cliente.id}"
-                                data-nome="${cliente.nome}"
-                                data-telefone="${cliente.telefoneWhatsApp}"
-                                data-documento="${cliente.documento}"
-                                data-tipo="${cliente.tipo}">
+                                data-id="${escaparHtml(cliente.id)}"
+                                data-nome="${escaparHtml(cliente.nome)}"
+                                data-telefone="${escaparHtml(cliente.telefoneWhatsApp)}"
+                                data-documento="${escaparHtml(cliente.documento)}"
+                                data-tipo="${escaparHtml(cliente.tipo)}">
                             <i class="bi bi-pencil"></i>
                         </button>
                             <button class="btn btn-sm btn-outline-danger btn-excluir" 
                                 title="Excluir"
-                                data-id="${cliente.id}">
+                                data-id="${escaparHtml(cliente.id)}">
                                 <i class="bi bi-trash"></i>
                             </button>
-                        </div>
+                        </div>  
                     </div>
                 </div>
             `;
