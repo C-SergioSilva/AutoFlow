@@ -1,5 +1,7 @@
 ﻿using AutoFlow.Domain.Entidades;
+using AutoFlow.Domain.Excecoes;
 using AutoFlow.Domain.Interfacees;
+using AutoFlow.Domain.Utils;
 using AutoFlow.Service.Interface;
 using AutoFlow.Service.ViewsModel;
 using AutoMapper;
@@ -8,106 +10,107 @@ namespace AutoFlow.Service.Services
 {
     public class VeiculoService : IVeiculoService
     {
-        protected readonly IMapper map;
-        protected readonly IVeiculoRepositorio repositorio;
-        public VeiculoService(IMapper map, IVeiculoRepositorio repositorio)
+        private const int QuantidadeMaximaPorPagina = 50;
+
+        private readonly IMapper map;
+        private readonly IVeiculoRepositorio repositorio;
+        private readonly IClienteRepositorio clienteRepositorio;
+
+        public VeiculoService(IMapper map, IVeiculoRepositorio repositorio, IClienteRepositorio clienteRepositorio)
         {
             this.map = map;
             this.repositorio = repositorio;
-        }
-        public async Task<VeiculoVM> AdicionarSalvar(VeiculoVM veiculoVM)
-        {
-            try
-            {
-                var veiculo = map.Map<Veiculo>(veiculoVM);
-                var veiculoAdicionado = await repositorio.AdicionarESalvar(veiculo);
-                return map.Map<VeiculoVM>(veiculoAdicionado);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-            
+            this.clienteRepositorio = clienteRepositorio;
         }
 
-        public async Task<VeiculoVM> AtualizarVeiculo(VeiculoVM veiculoVM)
+        public async Task<PagedResult<VeiculoVM>> ObterVeiculosPaginadosAsync(
+            int pagina, int quantidade, string placa, string modelo, int? clienteId)
         {
-            try
+            if (pagina < 1) pagina = 1;
+            if (quantidade < 1) quantidade = 10;
+            if (quantidade > QuantidadeMaximaPorPagina) quantidade = QuantidadeMaximaPorPagina;
+
+            var resultado = await repositorio.ObterVeiculosPaginadosAsync(
+                pagina, quantidade, ValidadorVeiculo.LimparPlaca(placa), modelo?.Trim(), clienteId);
+
+            return new PagedResult<VeiculoVM>
             {
-                var veiculo = map.Map<Veiculo>(veiculoVM);
-                var veiculoAtualizado = await repositorio.Atualizar(veiculo);
-                return map.Map<VeiculoVM>(veiculoAtualizado);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-            
+                Items = map.Map<List<VeiculoVM>>(resultado.Items),
+                PageNumber = resultado.PageNumber,
+                PageSize = resultado.PageSize,
+                TotalRecords = resultado.TotalRecords
+            };
         }
 
-        public async Task<IEnumerable<VeiculoVM>> ObterTodos()
+        public async Task<VeiculoVM> ObterVeiculoPorId(int id)
         {
-            try
-            {
-                var veiculos = await repositorio.ObterTodos();
-                return map.Map<IEnumerable<VeiculoVM>>(veiculos);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-            
+            var veiculo = await repositorio.ObterPorIdComClienteAsync(id)
+                ?? throw new NaoEncontradoException("Veículo não encontrado.");
+            return map.Map<VeiculoVM>(veiculo);
         }
 
-        public async Task<IEnumerable<VeiculoVM>> ObterTodosVeiculosEClientes() 
-        { 
-            try
-            {
-                var veiculos = await repositorio.ObterTodosVeiculosEClientes();
-                return map.Map<IEnumerable<VeiculoVM>>(veiculos);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
+        public async Task<VeiculoVM> AdicionarSalvar(VeiculoVM vm)
+        {
+            await ValidarEPadronizarAsync(vm, null);
+
+            var entidade = map.Map<Veiculo>(vm);
+            entidade.Id = 0;                       // nunca confie em Id vindo de fora na criação
+            await repositorio.AdicionarESalvar(entidade);
+
+            return await ObterVeiculoPorId(entidade.Id);   // recarrega já com o nome do cliente
         }
 
-        public async Task<VeiculoVM> ObterVeiculoPorId(int Id)
+        public async Task<VeiculoVM> AtualizarVeiculo(VeiculoVM vm)
         {
-            try
-            {
-                var veiculo = await repositorio.ObterPorId(Id);
-                return map.Map<VeiculoVM>(veiculo);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
+            var entidade = await repositorio.ObterPorId(vm.Id)
+                ?? throw new NaoEncontradoException("Veículo não encontrado.");
+
+            await ValidarEPadronizarAsync(vm, vm.Id);
+
+            map.Map(vm, entidade);                 // altera só os campos do formulário
+            await repositorio.Commit();
+
+            return await ObterVeiculoPorId(entidade.Id);
         }
 
-        public async Task<IEnumerable<VeiculoVM>> ObterVeiculos()
+        public async Task StatusDeletado(int id)
         {
-            try
-            {
-                var veiculos = await repositorio.ObterTodos();
-                return map.Map<IEnumerable<VeiculoVM>>(veiculos);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
+            _ = await repositorio.ObterPorId(id)
+                ?? throw new NaoEncontradoException("Veículo não encontrado.");
+            await repositorio.MarcarComoDeletadoPorId(id);
         }
 
-        public async Task StatusDeletado(int Id)
+        // Toda a regra de validação em UM lugar, usada pelo cadastro e pela edição
+        private async Task ValidarEPadronizarAsync(VeiculoVM vm, int? idAtual)
         {
-            try
+            vm.Placa = ValidadorVeiculo.LimparPlaca(vm.Placa);
+            if (!ValidadorVeiculo.PlacaValida(vm.Placa))
+                throw new RegraDeNegocioException("Placa inválida. Use o formato ABC1234 ou ABC1D23.");
+            if (await repositorio.ExistePlacaAsync(vm.Placa, idAtual))
+                throw new RegraDeNegocioException("Já existe um veículo cadastrado com esta placa.");
+
+            vm.Chassi = ValidadorVeiculo.LimparChassi(vm.Chassi);
+            if (vm.Chassi != null)
             {
-                await repositorio.MarcarComoDeletadoPorId(Id);
+                if (!ValidadorVeiculo.ChassiValido(vm.Chassi))
+                    throw new RegraDeNegocioException("Chassi inválido. Ele deve ter 17 caracteres (sem I, O ou Q).");
+                if (await repositorio.ExisteChassiAsync(vm.Chassi, idAtual))
+                    throw new RegraDeNegocioException("Já existe um veículo cadastrado com este chassi.");
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
+
+            if (string.IsNullOrWhiteSpace(vm.Marca)) throw new RegraDeNegocioException("Informe a marca.");
+            if (string.IsNullOrWhiteSpace(vm.Modelo)) throw new RegraDeNegocioException("Informe o modelo.");
+            vm.Marca = vm.Marca.Trim();
+            vm.Modelo = vm.Modelo.Trim();
+            vm.Cor = string.IsNullOrWhiteSpace(vm.Cor) ? null : vm.Cor.Trim();
+
+            if (vm.Quilometragem < 0)
+                throw new RegraDeNegocioException("A quilometragem não pode ser negativa.");
+            if (vm.AnoModelo.HasValue && (vm.AnoModelo < 1900 || vm.AnoModelo > DateTime.UtcNow.Year + 1))
+                throw new RegraDeNegocioException("Ano do modelo inválido.");
+
+            if (await clienteRepositorio.ObterPorId(vm.ClienteId) == null)
+                throw new RegraDeNegocioException("O cliente informado não existe.");
         }
     }
 }

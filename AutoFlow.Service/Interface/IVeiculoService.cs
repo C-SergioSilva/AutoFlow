@@ -1,15 +1,11 @@
-﻿using AutoFlow.Service.ViewsModel;
+﻿using AutoFlow.Domain.Entidades;
+using AutoFlow.Service.ViewsModel;
 
-namespace AutoFlow.Service.Interface
+public interface IVeiculoService
 {
-    public interface IVeiculoService
-    {
-        Task<VeiculoVM> AdicionarSalvar(VeiculoVM veiculoVM);
-        Task<IEnumerable<VeiculoVM>> ObterTodosVeiculosEClientes();   
-        Task<IEnumerable<VeiculoVM>> ObterTodos();
-        Task<VeiculoVM> ObterVeiculoPorId(int Id);
-        Task<VeiculoVM> AtualizarVeiculo(VeiculoVM veiculoVM); 
-        Task StatusDeletado(int Id);
-        Task<IEnumerable<VeiculoVM>> ObterVeiculos();
-    }
+    Task<PagedResult<VeiculoVM>> ObterVeiculosPaginadosAsync(int pagina, int quantidade, string placa, string modelo, int? clienteId);
+    Task<VeiculoVM> ObterVeiculoPorId(int id);
+    Task<VeiculoVM> AdicionarSalvar(VeiculoVM veiculo);
+    Task<VeiculoVM> AtualizarVeiculo(VeiculoVM veiculo);
+    Task StatusDeletado(int id);
 }

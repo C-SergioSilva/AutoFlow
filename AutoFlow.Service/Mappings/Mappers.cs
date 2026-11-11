@@ -9,13 +9,18 @@ namespace AutoFlow.Service.Mappings
         public Mappers()
         {
             CreateMap<Cliente, ClienteVM>().ReverseMap();
-            CreateMap<Veiculo, VeiculoVM>().ReverseMap();
-
             CreateMap<ClienteVM, Cliente>()
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.Deleted, o => o.Ignore())
                 .ForMember(d => d.Veiculos, o => o.Ignore());
-            
+
+            CreateMap<Veiculo, VeiculoVM>();
+            CreateMap<VeiculoVM, Veiculo>()
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.UpdatedAt, o => o.Ignore())
+                .ForMember(d => d.Deleted, o => o.Ignore())
+                .ForMember(d => d.Cliente, o => o.Ignore());
+
         }
     }
 }

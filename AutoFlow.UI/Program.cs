@@ -3,6 +3,7 @@ using AutoFlow.Infrastructure.Data;
 using AutoFlow.Infrastructure.Repositorios;
 using AutoFlow.Service.Interface;
 using AutoFlow.Service.Services;
+using AutoFlow.UI.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,7 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAss
 #endregion
 
 var app = builder.Build();
+app.UseMiddleware<TratamentoDeErrosMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
