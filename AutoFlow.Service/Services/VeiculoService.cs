@@ -30,8 +30,16 @@ namespace AutoFlow.Service.Services
             if (quantidade < 1) quantidade = 10;
             if (quantidade > QuantidadeMaximaPorPagina) quantidade = QuantidadeMaximaPorPagina;
 
+            var placaLimpa = ValidadorVeiculo.LimparPlaca(placa);
+            if (placaLimpa.Length is > 0 and < 3)
+                throw new RegraDeNegocioException("O filtro por placa precisa ter pelo menos 3 caracteres.");
+
+            var modeloLimpo = modelo?.Trim();
+            if (modeloLimpo is { Length: > 0 and < 3 })
+                throw new RegraDeNegocioException("O filtro por marca ou modelo precisa ter pelo menos 3 caracteres.");
+
             var resultado = await repositorio.ObterVeiculosPaginadosAsync(
-                pagina, quantidade, ValidadorVeiculo.LimparPlaca(placa), modelo?.Trim(), clienteId);
+                pagina, quantidade, placaLimpa, modeloLimpo, clienteId);
 
             return new PagedResult<VeiculoVM>
             {

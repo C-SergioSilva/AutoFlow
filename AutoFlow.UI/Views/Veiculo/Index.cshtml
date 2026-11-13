@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Gerenciamento de Veículos";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="color-text-padrao fw-bold mb-1">Painel de Veículos</h2>
+            <p class="text-muted-padrao small mb-0">Gerencie os veículos dos seus clientes.</p>
+        </div>
+        <button type="button" class="btn btn-color-padrao shadow-sm" data-bs-toggle="modal" data-bs-target="#modalVeiculo">
+            <i class="bi bi-plus-lg me-1"></i> Novo Veículo
+        </button>
+    </div>
+
+    <hr class="mb-4" />
+
+    <div id="paginacao-container01"></div>
+
+    <div class="row g-3" id="container-veiculos"></div>
+
+    <div id="paginacao-container02"></div>
+</div>
+
+<!-- ========== MODAL DE CADASTRO / EDIÇÃO ========== -->
+<div class="modal fade" id="modalVeiculo" tabindex="-1" aria-labelledby="modalVeiculoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary-modal text-white">
+                <h5 class="modal-title" id="modalVeiculoLabel">
+                    <i class="bi bi-car-front-fill me-2"></i> Cadastrar Novo Veículo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="formVeiculo" novalidate>
+                    <input type="hidden" id="veiculoId" value="">
+                    <input type="hidden" id="clienteId" value="">
+
+                    <!-- Cliente (busca por nome) -->
+                    <div class="mb-3 position-relative">
+                        <label for="clienteBusca" class="form-label fw-semibold text-secondary">Cliente (proprietário)</label>
+                        <input type="text" class="form-control" id="clienteBusca" autocomplete="off"
+                               placeholder="Digite ao menos 3 letras do nome do cliente...">
+                        <div id="listaClientes" class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 1060;"></div>
+                        <div class="invalid-feedback">Selecione um cliente da lista.</div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label for="placa" class="form-label fw-semibold text-secondary">Placa</label>
+                            <input type="text" class="form-control text-uppercase" id="placa" maxlength="7" placeholder="ABC1D23">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="marca" class="form-label fw-semibold text-secondary">Marca</label>
+                            <input type="text" class="form-control" id="marca" maxlength="60" placeholder="Ex: Fiat">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="modelo" class="form-label fw-semibold text-secondary">Modelo</label>
+                            <input type="text" class="form-control" id="modelo" maxlength="100" placeholder="Ex: Argo Drive">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label for="anoModelo" class="form-label fw-semibold text-secondary">Ano do modelo</label>
+                            <input type="number" class="form-control" id="anoModelo" min="1900" placeholder="2022">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="cor" class="form-label fw-semibold text-secondary">Cor</label>
+                            <input type="text" class="form-control" id="cor" maxlength="30" placeholder="Ex: Prata">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="combustivel" class="form-label fw-semibold text-secondary">Combustível</label>
+                            <select class="form-select" id="combustivel">
+                                <option value="NaoInformado" selected>Não informado</option>
+                                <option value="Flex">Flex</option>
+                                <option value="Gasolina">Gasolina</option>
+                                <option value="Etanol">Etanol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Gnv">GNV</option>
+                                <option value="Eletrico">Elétrico</option>
+                                <option value="Hibrido">Híbrido</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="quilometragem" class="form-label fw-semibold text-secondary">KM atual</label>
+                            <input type="number" class="form-control" id="quilometragem" min="0" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <label for="chassi" class="form-label fw-semibold text-secondary">Chassi <span class="text-muted fw-normal">(opcional)</span></label>
+                        <input type="text" class="form-control text-uppercase" id="chassi" maxlength="17" placeholder="17 caracteres">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-salvar-modal-padrao px-4" id="btnSalvarVeiculo">Salvar Veículo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== MODAL DE CONFIRMAÇÃO DE EXCLUSÃO ========== -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este veículo?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/veiculo/veiculo.js" asp-append-version="true"></script>
+}

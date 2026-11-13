@@ -70,14 +70,33 @@ namespace AutoFlow.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AnoModelo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Chassi")
+                        .HasMaxLength(17)
+                        .HasColumnType("nvarchar(17)");
+
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
+
+                    b.Property<int>("Combustivel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Cor")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
 
                     b.Property<string>("Modelo")
                         .IsRequired()
@@ -86,8 +105,8 @@ namespace AutoFlow.Infrastructure.Migrations
 
                     b.Property<string>("Placa")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<int>("Quilometragem")
                         .HasColumnType("int");
@@ -97,7 +116,15 @@ namespace AutoFlow.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Chassi")
+                        .IsUnique()
+                        .HasFilter("[Deleted] = 0 AND [Chassi] IS NOT NULL");
+
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("Placa")
+                        .IsUnique()
+                        .HasFilter("[Deleted] = 0");
 
                     b.ToTable("Veiculos", (string)null);
                 });
@@ -107,7 +134,7 @@ namespace AutoFlow.Infrastructure.Migrations
                     b.HasOne("AutoFlow.Domain.Entidades.Cliente", "Cliente")
                         .WithMany("Veiculos")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cliente");

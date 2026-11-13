@@ -1,0 +1,60 @@
+@host = https://localhost:7240
+
+### 1. Criar válido -> esperado 201 (JÁ RODOU; se repetir agora dará 400, é normal)
+POST {{host}}/api/VeiculoApi
+Content-Type: application/json
+
+{ "placa": "ABC-1D23", "marca": "Fiat", "modelo": "Argo", "anoModelo": 2022,
+  "cor": "Branco", "combustivel": "Flex", "quilometragem": 41000, "clienteId": 1 }
+
+### 2. Listar -> esperado 200 (JÁ RODOU)
+GET {{host}}/api/VeiculoApi/paginados?placa=abc
+
+### 3. Mesma placa de novo -> esperado 400 "Já existe um veículo..."
+POST {{host}}/api/VeiculoApi
+Content-Type: application/json
+
+{ "placa": "ABC1D23", "marca": "Fiat", "modelo": "Argo", "clienteId": 1 }
+
+### 4. Placa inválida -> esperado 400 "Placa inválida"
+POST {{host}}/api/VeiculoApi
+Content-Type: application/json
+
+{ "placa": "AB-123", "marca": "Fiat", "modelo": "Argo", "clienteId": 1 }
+
+### 5. Cliente inexistente -> esperado 400 "O cliente informado não existe."
+POST {{host}}/api/VeiculoApi
+Content-Type: application/json
+
+{ "placa": "XYZ9A87", "marca": "VW", "modelo": "Gol", "clienteId": 9999 }
+
+### 6. Atualizar veículo que não existe -> esperado 404
+PUT {{host}}/api/VeiculoApi/9999
+Content-Type: application/json
+
+{ "placa": "XYZ9A87", "marca": "VW", "modelo": "Gol", "clienteId": 1 }
+
+### 7. Editar o veículo de id 1 -> esperado 200 (modelo "Argo Drive", cor "Prata")
+PUT {{host}}/api/VeiculoApi/1
+Content-Type: application/json
+
+{ "placa": "ABC1D23", "marca": "Fiat", "modelo": "Argo Drive", "anoModelo": 2022,
+  "cor": "Prata", "combustivel": "Flex", "quilometragem": 42000, "clienteId": 1 }
+
+### 8. Excluir o veículo de id 1 -> esperado 204 (sem corpo)
+DELETE {{host}}/api/VeiculoApi/1
+
+### 9. Recadastrar a MESMA placa após excluir -> esperado 201
+POST {{host}}/api/VeiculoApi
+Content-Type: application/json
+
+{ "placa": "ABC1D23", "marca": "Fiat", "modelo": "Argo", "clienteId": 1 }
+
+### 10. Filtro curto de placa -> esperado 400 "O filtro por placa precisa ter pelo menos 3 caracteres."
+GET {{host}}/api/VeiculoApi/paginados?placa=ab
+
+### 11. Filtro curto de modelo -> esperado 400
+GET {{host}}/api/VeiculoApi/paginados?modelo=fi
+
+### 12. Filtros válidos -> esperado 200
+GET {{host}}/api/VeiculoApi/paginados?placa=abc
