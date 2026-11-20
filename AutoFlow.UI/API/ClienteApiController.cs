@@ -30,77 +30,31 @@ public class ClienteApiController : ControllerBase // ou ClienteApiController
 
     }
 
-    [HttpGet("paginados")] // Rota que a tela vai chamar: /api/cliente/paginados?pagina=1&quantidade=10
-    public async Task<IActionResult> ObterClientesPaginados([FromQuery] int pagina = 1,[FromQuery] int quantidade = 10,[FromQuery] string nome = null,
-    [FromQuery] int? tipoDocumento = null, [FromQuery] string documento = null)
-    {
-        try
-        {
-            // 1. Validação de segurança básica para evitar valores inválidos
-            if (pagina < 1) pagina = 1;
-            if (quantidade < 1) quantidade = 10;
-
-            // 2. Chama o serviço que criamos agora pouco
-            var resultadoPaginado = await clienteService.ObterClientesPaginadosAsync(pagina, quantidade, nome, tipoDocumento, documento);
-
-            // 3. Retorna o resultado com sucesso (HTTP 200) contendo nossos dados e metadados
-            return Ok(resultadoPaginado);
-        }
-        catch (Exception ex)
-        {
-            // 4. Se der qualquer pepino, devolvemos um erro amigável
-            return StatusCode(500, new { mensagem = "Erro ao buscar clientes paginados.", detalhes = ex.Message });
-        }
-    }
+    [HttpGet("paginados")]
+    public async Task<IActionResult> ObterClientesPaginados([FromQuery] int pagina = 1, [FromQuery] int quantidade = 10,
+    [FromQuery] string nome = null, [FromQuery] int? tipoDocumento = null, [FromQuery] string documento = null)
+    => Ok(await clienteService.ObterClientesPaginadosAsync(pagina, quantidade, nome, tipoDocumento, documento));
 
     [HttpPost]
     public async Task<IActionResult> AdicionarSalvar([FromBody] ClienteVM cliente)
     {
-        try
+        if (cliente == null)
+            return BadRequest("Cliente inválido ou não encontrado.");
+
+        if (cliente.Id > 0)
         {
-            if (cliente == null)
-            {
-                return BadRequest("Cliente inválido ou não encontrado.");
-            }
-
-            var resultado = new ClienteVM();
-
-            if (cliente.Id > 0)
-            {
-                resultado = await clienteService.AtualizarCliente(cliente);
-
-                // Blindagem contra ID inexistente (Evita o erro 500 / NullReferenceException)
-                if (resultado == null)
-                {
-                    return NotFound("Cliente não encontrado para atualização.");
-                }
-
-                return CreatedAtAction(nameof(ObterTodos), new { id = resultado.Id }, resultado);
-            }
-
-            resultado = await clienteService.AdicionarSalvar(cliente);
-            return CreatedAtAction(nameof(ObterTodos), new { id = resultado.Id }, resultado);
+            var atualizado = await clienteService.AtualizarCliente(cliente);
+            return Ok(atualizado);
         }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message, ex);
-        }
+
+        var criado = await clienteService.AdicionarSalvar(cliente);
+        return CreatedAtAction(nameof(ObterTodos), new { id = criado.Id }, criado);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Deletar(int id)
     {
-        try
-        {
-            // Chamamos diretamente o serviço passando o ID que veio na URL
-            await clienteService.MarcarStatusDeletadoClienteVeiculos(id);
-
-            // Retorna um status 204 (NoContent) indicando que deu tudo certo e foi excluído
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { mensagem = ex.Message });
-        }
+        await clienteService.MarcarStatusDeletadoClienteVeiculos(id);
+        return NoContent();
     }
 }

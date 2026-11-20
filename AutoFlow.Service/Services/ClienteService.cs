@@ -4,6 +4,7 @@ using AutoFlow.Domain.Interfacees;
 using AutoFlow.Domain.Utils;
 using AutoFlow.Service.Interface;
 using AutoFlow.Service.ViewsModel;
+using AutoFlow.Domain.Excecoes;
 using AutoMapper;
 
 namespace AutoFlow.Service.Services
@@ -12,6 +13,7 @@ namespace AutoFlow.Service.Services
     {
         protected readonly IMapper map;
         protected readonly IClienteRepositorio repositorio;
+        private const int QuantidadeMaximaPorPagina = 50;
         public ClienteService(IMapper map, IClienteRepositorio repositorio)
         {
             this.map = map;
@@ -20,96 +22,26 @@ namespace AutoFlow.Service.Services
 
         public async Task<ClienteVM> AdicionarSalvar(ClienteVM clienteVM)
         {
-            try
-            {
-                // 1. Limpa o documento para garantir que temos apenas números puros
-                clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
+            ValidarDocumento(clienteVM);
 
-                // 🌟 2. AQUI ENTRA A NOSSA VALIDAÇÃO MATEMÁTICA!
-                // Verificamos se o documento foi preenchido e validamos de acordo com o tipo de cliente (CPF ou CNPJ)
-                if (!string.IsNullOrEmpty(clienteVM.Documento))
-                {
-                    // Supondo que você tenha uma propriedade indicando se é Pessoa Física (ex: Tipo == 1) ou Jurídica (ex: Tipo == 2)
-                    // Ajuste o nome da propriedade 'Tipo' ou 'TipoPessoa' conforme o seu modelo real.
-
-                    bool documentoEhValido = false;
-
-                    if (clienteVM.Tipo == TipoCliente.Cpf) // Exemplo: 1 para CPF (Pessoa Física)
-                    {
-                        documentoEhValido = ValidadorDocumentoCPFCNPJ.ValidarCPF(clienteVM.Documento);
-                        if (!documentoEhValido)
-                        {
-                            throw new InvalidOperationException("O CPF informado é inválido!");
-                        }
-                    }
-                    else if (clienteVM.Tipo == TipoCliente.Cnpj) // Exemplo: 2 para CNPJ (Pessoa Jurídica)
-                    {
-                        documentoEhValido = ValidadorDocumentoCPFCNPJ.ValidarCNPJ(clienteVM.Documento);
-                        if (!documentoEhValido)
-                        {
-                            throw new InvalidOperationException("O CNPJ informado é inválido!");
-                        }
-                    }
-                }
-
-                // 3. Se passou pela validação, prossegue com o mapeamento e salvamento normal
-                var clienteEntidade = map.Map<Cliente>(clienteVM);
-                var clienteAdicionado = await repositorio.AdicionarESalvar(clienteEntidade);
-                return map.Map<ClienteVM>(clienteAdicionado);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(ex.Message);
-            }
+            var clienteEntidade = map.Map<Cliente>(clienteVM);
+            var clienteAdicionado = await repositorio.AdicionarESalvar(clienteEntidade);
+            return map.Map<ClienteVM>(clienteAdicionado);
         }
 
         public async Task<ClienteVM> AtualizarCliente(ClienteVM clienteVM)
         {
-            try
-            {
-                // 1. Limpa o documento para garantir que temos apenas números puros
-                clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
+            var clienteEntidade = await repositorio.ObterPorId(clienteVM.Id)
+                ?? throw new NaoEncontradoException("Cliente não encontrado.");
 
-                // 🌟 2. AQUI ENTRA A VALIDAÇÃO MATEMÁTICA!
-                // Verifica se o documento foi preenchido e valida de acordo com o tipo de cliente (CPF ou CNPJ)
-                if (!string.IsNullOrEmpty(clienteVM.Documento))
-                {
-                    // Supondo que você tenha uma propriedade indicando se é Pessoa Física (ex: Tipo == 1) ou Jurídica (ex: Tipo == 2)
-                    // Ajuste o nome da propriedade 'Tipo' ou 'TipoPessoa' conforme o seu modelo real.
+            // Só estes campos podem ser editados.
+            // Documento e Tipo NÃO entram aqui: mudar documento exigirá perfil de gerente e auditoria (pendência nº 3).
+            clienteEntidade.Nome = clienteVM.Nome;
+            clienteEntidade.TelefoneWhatsApp = clienteVM.TelefoneWhatsApp;
 
-                    bool documentoEhValido = false;
+            await repositorio.Commit();
 
-                    if (clienteVM.Tipo == TipoCliente.Cpf) // Exemplo: 1 para CPF (Pessoa Física)
-                    {
-                        documentoEhValido = ValidadorDocumentoCPFCNPJ.ValidarCPF(clienteVM.Documento);
-                        if (!documentoEhValido)
-                        {
-                            throw new InvalidOperationException("O CPF informado é inválido!");
-                        }
-                    }
-                    else if (clienteVM.Tipo == TipoCliente.Cnpj) // Exemplo: 2 para CNPJ (Pessoa Jurídica)
-                    {
-                        documentoEhValido = ValidadorDocumentoCPFCNPJ.ValidarCNPJ(clienteVM.Documento);
-                        if (!documentoEhValido)
-                        {
-                            throw new InvalidOperationException("O CNPJ informado é inválido!");
-                        }
-                    }
-                }
-
-                var clienteEntidade = await repositorio.ObterPorId(clienteVM.Id)
-                    ?? throw new InvalidOperationException("Cliente não encontrado.");
-                
-                map.Map(clienteVM, clienteEntidade);
-                await repositorio.Commit();
-
-                clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
-                return map.Map<ClienteVM>(clienteEntidade);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
+            return map.Map<ClienteVM>(clienteEntidade);
         }
 
         public async Task<ClienteVM> ObterClientePorId(int Id)
@@ -153,31 +85,29 @@ namespace AutoFlow.Service.Services
 
         public async Task<PagedResult<ClienteVM>> ObterClientesPaginadosAsync(int pagina, int quantidade, string nome, int? tipoDocumento, string documento)
         {
-            try
+            if (pagina < 1) pagina = 1;
+            if (quantidade < 1) quantidade = 10;
+            if (quantidade > QuantidadeMaximaPorPagina) quantidade = QuantidadeMaximaPorPagina;
+
+            var nomeLimpo = nome?.Trim();
+            if (nomeLimpo is { Length: > 0 and < 3 })
+                throw new RegraDeNegocioException("O filtro por nome precisa ter pelo menos 3 caracteres.");
+
+            documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(documento);
+
+            var resultadoRepositorio = await repositorio.ObterClientesPaginadosAsync(
+                pagina, quantidade, nomeLimpo, tipoDocumento, documento);
+
+            return new PagedResult<ClienteVM>
             {
-                documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(documento);
-                // 1. Chama o repositório que busca os dados paginados lá no banco
-                var resultadoRepositorio = await repositorio.ObterClientesPaginadosAsync(pagina, quantidade, nome, tipoDocumento, documento);
+                Items = map.Map<List<ClienteVM>>(resultadoRepositorio.Items),
+                PageNumber = resultadoRepositorio.PageNumber,
+                PageSize = resultadoRepositorio.PageSize,
+                TotalRecords = resultadoRepositorio.TotalRecords
+            };
+        }
 
-                // 2. Usa o AutoMapper para converter a lista de Entidades (Cliente) para ViewModels (ClienteVM)
-                var listaVM = map.Map<List<ClienteVM>>(resultadoRepositorio.Items);
-
-                // 3. Monta o PagedResult final contendo os ViewModels e as regras de paginação
-                return new PagedResult<ClienteVM>
-                {
-                    Items = listaVM,
-                    PageNumber = resultadoRepositorio.PageNumber,
-                    PageSize = resultadoRepositorio.PageSize,
-                    TotalRecords = resultadoRepositorio.TotalRecords
-                };
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-        }   
-
-        public async Task MarcarStatusDeletadoClienteVeiculos(int Id)
+        public async Task MarcarStatusDeletadoClienteVeiculos2(int Id)
         {
             try
             {
@@ -187,6 +117,14 @@ namespace AutoFlow.Service.Services
             {
                 throw new Exception(ex.Message, ex);
             }
+        }
+
+        public async Task MarcarStatusDeletadoClienteVeiculos(int Id) 
+        {
+            _ = await repositorio.ObterPorId(Id)
+                ?? throw new NaoEncontradoException("Cliente não encontrado.");
+
+            await repositorio.MarcarComoDeletadoClienteEVeiculo(Id);
         }
 
         public async Task MarcarComoDeletado(ClienteVM clienteVM)
@@ -200,6 +138,20 @@ namespace AutoFlow.Service.Services
             {
                 throw new Exception(ex.Message, ex);
             }
+        }
+
+        // Toda a validação do documento em UM lugar, usada pelo cadastro e pela edição
+        private static void ValidarDocumento(ClienteVM clienteVM)
+        {
+            clienteVM.Documento = ValidadorDocumentoCPFCNPJ.Limpardocumento(clienteVM.Documento);
+
+            if (string.IsNullOrEmpty(clienteVM.Documento)) return;
+
+            if (clienteVM.Tipo == TipoCliente.Cpf && !ValidadorDocumentoCPFCNPJ.ValidarCPF(clienteVM.Documento))
+                throw new RegraDeNegocioException("O CPF informado é inválido!");
+
+            if (clienteVM.Tipo == TipoCliente.Cnpj && !ValidadorDocumentoCPFCNPJ.ValidarCNPJ(clienteVM.Documento))
+                throw new RegraDeNegocioException("O CNPJ informado é inválido!");
         }
 
     }

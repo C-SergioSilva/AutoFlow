@@ -44,24 +44,22 @@ namespace AutoFlow.Infrastructure.Repositorios
                 TotalRecords = totalRegistros
             };
         }
-        public async Task MarcarComoDeletadoClienteEVeiculo(int clienteId) 
+
+        public async Task MarcarComoDeletadoClienteEVeiculo(int clienteId)
         {
-            // Usamos o DbSet genérico ou fazemos cast do contexto para AppDbContext
-            var dbContext = (AppDbContext)context;
+            // Carrega o cliente JUNTO com os veículos (o filtro de excluídos já é aplicado sozinho)
+            var cliente = await dbSet
+                .Include(c => c.Veiculos)
+                .SingleOrDefaultAsync(c => c.Id == clienteId);
 
-            var cliente = await dbContext.Clientes.FindAsync(clienteId);
-            if (cliente != null)
-            {
-                cliente.Deleted = true;
-                dbContext.Clientes.Update(cliente);
+            if (cliente == null) return;   // o 404 virá no Passo 1, junto com o tratamento de erros
 
-                // Atualiza os veículos em lote de forma ultra rápida com o DbSet de veículos
-                await dbContext.Set<Veiculo>()
-                    .Where(v => v.ClienteId == clienteId && !v.Deleted)
-                    .ExecuteUpdateAsync(s => s.SetProperty(v => v.Deleted, true));
+            cliente.Deleted = true;
+            foreach (var veiculo in cliente.Veiculos)
+                veiculo.Deleted = true;
 
-                await dbContext.SaveChangesAsync();
-            }
+            // UM único SaveChanges: grava tudo ou nada, e o RegistrarDatas() carimba o UpdatedAt de todos
+            await context.SaveChangesAsync();
         }
 
     }

@@ -1,0 +1,76 @@
+@host = https://localhost:7240
+
+### 1. Criar cliente de teste -> esperado 201 (anote o "id" da resposta)
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "nome": "Cliente  de teste passo 1.4", "telefoneWhatsApp": "85999990000",
+  "tipo": 1, "documento": "52998224725" }
+
+### 2. Criar veículo para esse cliente -> esperado 201
+### ATENÇÃO: troque o clienteId pelo id que veio no passo 1
+POST {{host}}/api/VeiculoApi
+Content-Type: application/json
+
+{ "placa": "TST6A26", "marca": "toyota", "modelo": "Hilux", "clienteId": 38}
+
+### 3. Excluir o cliente (cascata) -> esperado 204
+### ATENÇÃO: troque o 1 pelo id do cliente
+DELETE {{host}}/api/ClienteApi/3
+
+### SIMULANDO ERROS (para testar tratamento de erros no front-end)
+
+### 4. CPF inválido -> HOJE vira 500 (esperado depois: 400 "O CPF informado é inválido!")
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "nome": "Teste CPF Invalido", "telefoneWhatsApp": "85999990000",
+  "tipo": 1, "documento": "11111111111" }
+
+### 5. Excluir cliente que NÃO existe -> HOJE vira 204 (esperado depois: 404)
+DELETE {{host}}/api/ClienteApi/39
+
+### 6. Atualizar cliente que NÃO existe -> HOJE vira 500 (esperado depois: 404)
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "id": 999999, "nome": "Fantasma", "telefoneWhatsApp": "85999990000",
+  "tipo": 1, "documento": "52998224725" }
+
+### 7. Filtro de nome curto no servidor -> HOJE vira 200 (esperado depois: 400)
+GET {{host}}/api/ClienteApi/paginados?nome=ab
+
+### 8. Atualizar cliente existente -> esperado 200
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "id": 38, "nome": "Cliente 04 Editado", "telefoneWhatsApp": "85999990000",
+  "tipo": 1, "documento": "52998224725" }
+
+### 9. Filtro válido -> esperado 200
+GET {{host}}/api/ClienteApi/paginados?nome=Cli
+
+### 10. Teto de itens por página -> esperado 200 com "pageSize": 50
+GET {{host}}/api/ClienteApi/paginados?quantidade=1000
+
+### 11. Trocar o CPF de um cliente existente -> HOJE vira 200 e o documento MUDA (esperado depois: documento continua o original)
+### Usa o cliente 38, criado por você para teste. CPF novo é válido.
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "id": 38, "nome": "Cliente 04 Editado", "telefoneWhatsApp": "85999990000",
+  "tipo": 1, "documento": "11144477735" }
+
+### 12. Restaurar o CPF original do cliente 38 (rode depois do 11)
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "id": 38, "nome": "Cliente 04 Editado", "telefoneWhatsApp": "85999990000",
+  "tipo": 1, "documento": "52998224725" }
+
+### 13. Tentar trocar documento e tipo na edição -> esperado 200, mas documento e tipo NÃO mudam; nome e telefone mudam
+POST {{host}}/api/ClienteApi
+Content-Type: application/json
+
+{ "id": 38, "nome": "Cliente 04 Nome Novo", "telefoneWhatsApp": "85988880000",
+  "tipo": 2, "documento": "11144477735" }
